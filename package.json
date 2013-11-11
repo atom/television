@@ -1,0 +1,42 @@
+{
+  "name": "television",
+  "version": "0.0.0",
+  "description": "A minimalist framework for binding reactive views to observable models",
+  "main": "src/television",
+  "scripts": {
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atom/television"
+  },
+  "keywords": [
+    "view",
+    "dom",
+    "mvvm",
+    "binding"
+  ],
+  "author": "Nathan Sobo",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://github.com/atom/television/raw/master/LICENSE.md"
+    }
+  ],
+  "bugs": {
+    "url": "https://github.com/atom/television/issues"
+  },
+  "devDependencies": {
+    "jasmine-focused": "~0.14.0",
+    "grunt-contrib-coffee": "~0.7.0",
+    "grunt-cli": "~0.1.8",
+    "grunt": "~0.4.1",
+    "grunt-shell": "~0.2.2",
+    "grunt-coffeelint": "0.0.6",
+    "rimraf": "~2.2.2"
+  },
+  "dependencies": {
+    "jsdom": "~0.8.8",
+    "underscore": "~1.5.2"
+  }
+}
