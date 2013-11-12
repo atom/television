@@ -3,14 +3,14 @@ HTMLBuilder = require './html-builder'
 View = require './view'
 
 module.exports =
-class Factory
+class Template
   constructor: ({@name, @content, @parent}={}) ->
-    @subfactories = []
+    @subtemplates = []
 
   register: (name, params) ->
-    subfactory = new @constructor(extend({name, parent: this}, params))
-    @subfactories.push(subfactory)
-    @[name] = subfactory
+    subtemplate = new @constructor(extend({name, parent: this}, params))
+    @subtemplates.push(subtemplate)
+    @[name] = subtemplate
 
   build: (model) ->
     if @canBuild(model)
@@ -18,8 +18,8 @@ class Factory
       new View(element, model) if element?
       element
     else
-      if subfactory = find(@subfactories, (f) -> f.canBuild(model))
-        subfactory.build(model)
+      if subtemplate = find(@subtemplates, (f) -> f.canBuild(model))
+        subtemplate.build(model)
       else
         @parent?.build(model)
 
