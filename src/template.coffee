@@ -7,7 +7,7 @@ class Template
   constructor: ({@name, @content, @parent}={}) ->
     @subtemplates = []
 
-  register: (name, params) ->
+  addTemplate: (name, params) ->
     subtemplate = new @constructor(extend({name, parent: this}, params))
     @subtemplates.push(subtemplate)
     @[name] = subtemplate
