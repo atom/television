@@ -3,7 +3,7 @@ HTMLBuilder = require './html-builder'
 
 module.exports =
 class Factory
-  constructor: ({@name, @content, @parent}) ->
+  constructor: ({@name, @content, @parent}={}) ->
     @subfactories = []
 
   register: (name, params) ->

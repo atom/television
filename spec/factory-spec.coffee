@@ -8,11 +8,15 @@ describe "Factory", ->
   class Comment
 
   beforeEach ->
-    factory = new Factory(name: "Blog", content: "<div>Blog</div>")
-    factory.register("Post", content: "<div>Post</div>")
-    factory.register("Comment", content: "<div>Comment</div>")
+    factory = new Factory
 
   describe "factory selection", ->
+    beforeEach ->
+      factory.name = "Blog"
+      factory.content = "<div>Blog</div>"
+      factory.register("Post", content: "<div>Post</div>")
+      factory.register("Comment", content: "<div>Comment</div>")
+
     describe "when the receiving factory can build a view for the given model", ->
       it "constructs a view for itself", ->
         expect(factory.build(new Blog).outerHTML).toBe "<div>Blog</div>"
@@ -34,9 +38,12 @@ describe "Factory", ->
             expect(factory.build(new Favorite)).toBeUndefined()
 
   describe "DOM fragment construction", ->
+    beforeEach ->
+      factory.name = "Blog"
+
     describe "when the content property is a string", ->
       it "parses the string to a DOM fragment", ->
-        expect(typeof factory.content).toBe 'string'
+        factory.content = "<div>Blog</div>"
         expect(factory.build(new Blog).outerHTML).toBe "<div>Blog</div>"
 
     describe "when the content property is already a DOM fragment", ->
