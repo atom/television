@@ -32,3 +32,42 @@ describe "Factory", ->
           it "returns undefined", ->
             class Favorite
             expect(factory.build(new Favorite)).toBeUndefined()
+
+  describe "DOM fragment construction", ->
+    describe "when the content property is a string", ->
+      it "parses the string to a DOM fragment", ->
+        expect(typeof factory.content).toBe 'string'
+        expect(factory.build(new Blog).outerHTML).toBe "<div>Blog</div>"
+
+    describe "when the content property is already a DOM fragment", ->
+      it "clones the fragment", ->
+        div = window.document.createElement("div")
+        div.innerHTML = "<div>Blog!</div>"
+        contentFragment = div.firstChild
+        factory.content = contentFragment
+
+        fragment = factory.build(new Blog)
+        expect(fragment.outerHTML).toBe contentFragment.outerHTML
+        expect(fragment).not.toBe contentFragment
+
+    describe "when the content property is a function", ->
+      beforeEach ->
+        factory.content = jasmine.createSpy("factory.content")
+
+      it "calls the function with the model", ->
+        blog = new Blog
+        factory.build(blog)
+        expect(factory.content).toHaveBeenCalledWith(blog)
+
+      describe "when the function returns a string", ->
+        it "parses the string as a DOM fragment", ->
+          factory.content.andReturn("<div>Blog!</div>")
+          expect(factory.build(new Blog).outerHTML).toBe "<div>Blog!</div>"
+
+      describe "when the function returns a DOM fragment", ->
+        it "returns the DOM fragment", ->
+          div = window.document.createElement("div")
+          div.innerHTML = "<div>Blog!</div>"
+          contentFragment = div.firstChild
+          factory.content.andReturn(contentFragment)
+          expect(factory.build(new Blog)).toBe contentFragment

@@ -12,7 +12,9 @@ class Factory
 
   build: (model) ->
     if @canBuild(model)
-      @nodeFromString(@content)
+
+      @buildFragment(model)
+
     else
       if subfactory = find(@subfactories, (f) -> f.canBuild(model))
         subfactory.build(model)
@@ -22,7 +24,20 @@ class Factory
   canBuild: (model) ->
     @name is model.constructor.name
 
-  nodeFromString: (string) ->
+  buildFragment: (model) ->
+    switch typeof @content
+      when 'string'
+        @parseFragment(@content)
+      when 'function'
+        result = @content(model)
+        if typeof result is 'string'
+          @parseFragment(result)
+        else
+          result
+      else
+        @content.cloneNode(true)
+
+  parseFragment: (string) ->
     div = window.document.createElement('div')
     div.innerHTML = string
     div.firstChild
