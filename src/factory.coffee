@@ -1,4 +1,5 @@
 {extend, find} = require 'underscore'
+HTMLBuilder = require './html-builder'
 
 module.exports =
 class Factory
@@ -29,7 +30,10 @@ class Factory
       when 'string'
         @parseFragment(@content)
       when 'function'
-        result = @content(model)
+        builder = new HTMLBuilder
+        result = @content.call(builder, model)
+        if builderResult = builder.toHTML()
+          result = builderResult
         if typeof result is 'string'
           @parseFragment(result)
         else

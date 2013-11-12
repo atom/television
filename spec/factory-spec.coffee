@@ -71,3 +71,8 @@ describe "Factory", ->
           contentFragment = div.firstChild
           factory.content.andReturn(contentFragment)
           expect(factory.build(new Blog)).toBe contentFragment
+
+      describe "when the function calls HTML tag methods", ->
+        it "returns a DOM fragment based on the called tag methods", ->
+          factory.content = -> @div => @h1 "Hello World!"
+          expect(factory.build(new Blog).outerHTML).toBe "<div><h1>Hello World!</h1></div>"
