@@ -1,11 +1,12 @@
+{Model} = require 'telepath'
 Factory = require '../src/factory'
 
 describe "Factory", ->
   factory = null
 
-  class Blog
-  class Post
-  class Comment
+  class Blog extends Model
+  class Post extends Model
+  class Comment extends Model
 
   beforeEach ->
     factory = new Factory
@@ -83,3 +84,16 @@ describe "Factory", ->
         it "returns a DOM fragment based on the called tag methods", ->
           factory.content = -> @div => @h1 "Hello World!"
           expect(factory.build(new Blog).outerHTML).toBe "<div><h1>Hello World!</h1></div>"
+
+  describe "bindings", ->
+    describe "text", ->
+      it "replaces the bound element's text content with the value of the bound property", ->
+        Blog.property 'title'
+        factory.register 'Blog', content: ->
+          @div => @h1 'tv-text': "title"
+
+        blog = Blog.createAsRoot(title: "Alpha")
+        node = factory.build(blog)
+        expect(node.outerHTML).toBe '<div><h1 tv-text="title">Alpha</h1></div>'
+        blog.title = "Beta"
+        expect(node.outerHTML).toBe '<div><h1 tv-text="title">Beta</h1></div>'

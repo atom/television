@@ -1,5 +1,6 @@
 {extend, find} = require 'underscore'
 HTMLBuilder = require './html-builder'
+View = require './view'
 
 module.exports =
 class Factory
@@ -13,7 +14,9 @@ class Factory
 
   build: (model) ->
     if @canBuild(model)
-      @buildFragment(model)
+      element = @buildFragment(model)
+      new View(element, model) if element?
+      element
     else
       if subfactory = find(@subfactories, (f) -> f.canBuild(model))
         subfactory.build(model)
