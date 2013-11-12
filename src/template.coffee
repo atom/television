@@ -29,20 +29,20 @@ class Template
   buildFragment: (model) ->
     switch typeof @content
       when 'string'
-        @parseFragment(@content)
+        @parseHTML(@content)
       when 'function'
         builder = new HTMLBuilder
         result = @content.call(builder, model)
         if builderResult = builder.toHTML()
           result = builderResult
         if typeof result is 'string'
-          @parseFragment(result)
+          @parseHTML(result)
         else
           result
       else
         @content.cloneNode(true)
 
-  parseFragment: (string) ->
+  parseHTML: (string) ->
     div = window.document.createElement('div')
     div.innerHTML = string
     div.firstChild
