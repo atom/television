@@ -13,9 +13,7 @@ class Factory
 
   build: (model) ->
     if @canBuild(model)
-
       @buildFragment(model)
-
     else
       if subfactory = find(@subfactories, (f) -> f.canBuild(model))
         subfactory.build(model)
