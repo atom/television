@@ -12,6 +12,6 @@ class View
       @createBindings(child)
 
     for attribute in element.attributes
-      if match = attribute.name.match(/^tv-(.*)/)
+      if match = attribute.name.match(/^x-bind-(.*)/)
         bindingType = match[1]
         @template.buildBinding(bindingType, element, @model, attribute.value)

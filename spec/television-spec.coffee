@@ -87,13 +87,13 @@ describe "Television", ->
       it "replaces the bound element's text content with the value of the bound property", ->
         Blog.property 'title'
         tv.register 'Blog', content: ->
-          @div => @h1 'tv-text': "title"
+          @div => @h1 'x-bind-text': "title"
 
         blog = Blog.createAsRoot(title: "Alpha")
         node = tv.build(blog)
-        expect(node.outerHTML).toBe '<div><h1 tv-text="title">Alpha</h1></div>'
+        expect(node.outerHTML).toBe '<div><h1 x-bind-text="title">Alpha</h1></div>'
         blog.title = "Beta"
-        expect(node.outerHTML).toBe '<div><h1 tv-text="title">Beta</h1></div>'
+        expect(node.outerHTML).toBe '<div><h1 x-bind-text="title">Beta</h1></div>'
 
     describe "component", ->
       it "replaces the bound element with a view based on the value of the bound property", ->
@@ -104,13 +104,13 @@ describe "Television", ->
         tv.register 'Blog', content: ->
           @div =>
             @h1 "Featured Item"
-            @div 'tv-component': "featuredItem"
-        tv.register 'Post', content: -> @div id: 'post', 'tv-text': 'title'
-        tv.register 'Comment', content: -> @div id: 'comment', 'tv-text': 'body'
+            @div 'x-bind-component': "featuredItem"
+        tv.register 'Post', content: -> @div id: 'post', 'x-bind-text': 'title'
+        tv.register 'Comment', content: -> @div id: 'comment', 'x-bind-text': 'body'
 
         post = new Post(title: "Alpha")
         comment = new Comment(title: "Hello")
         blog = Blog.createAsRoot(featuredItem: post)
 
         element = tv.build(blog)
-        expect(element.outerHTML).toBe '<div><h1>Featured Item</h1><div id="post" tv-text="title">Alpha</div></div>'
+        expect(element.outerHTML).toBe '<div><h1>Featured Item</h1><div id="post" x-bind-text="title">Alpha</div></div>'
