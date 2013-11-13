@@ -14,4 +14,4 @@ class View
     for attribute in element.attributes
       if match = attribute.name.match(/^x-bind-(.*)/)
         bindingType = match[1]
-        @template.buildBinding(bindingType, element, @model, attribute.value)
+        @template.bind(bindingType, element, @model, attribute.value)

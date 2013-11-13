@@ -33,11 +33,11 @@ class Template
   canVisualize: (model) ->
     @name is model.constructor.name
 
-  buildBinding: (type, element, model, propertyName) ->
+  bind: (type, element, model, propertyName) ->
     if binder = @binders[type]
       binder.bind(this, element, model, propertyName)
     else
-      @parent?.buildBinding(type, element, model, propertyName)
+      @parent?.bind(type, element, model, propertyName)
 
   buildFragment: (model) ->
     switch typeof @content
