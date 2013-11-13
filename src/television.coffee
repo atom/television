@@ -1,1 +1,2 @@
-module.exports = require './template'
+Template = require './template'
+module.exports = -> new Template

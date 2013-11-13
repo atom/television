@@ -1,5 +1,5 @@
 {Model} = require 'telepath'
-Television = require '../src/television'
+television = require '../src/television'
 
 describe "Television", ->
   class Blog extends Model
@@ -9,7 +9,7 @@ describe "Television", ->
   tv = null
 
   beforeEach ->
-    tv = new Television
+    tv = television()
 
   describe "template selection", ->
     beforeEach ->
