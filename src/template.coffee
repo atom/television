@@ -6,16 +6,22 @@ module.exports =
 class Template
   constructor: ({@name, @content, @parent}={}) ->
     @subtemplates = []
+    @bindingClasses = {}
+    unless @parent?
+      @addBindingClass(require './bindings/text-binding')
 
   addTemplate: (name, params) ->
     subtemplate = new @constructor(extend({name, parent: this}, params))
     @subtemplates.push(subtemplate)
     @[name] = subtemplate
 
+  addBindingClass: (bindingClass) ->
+    @bindingClasses[bindingClass.type] = bindingClass
+
   build: (model) ->
     if @canBuild(model)
       element = @buildFragment(model)
-      new View(element, model) if element?
+      new View(this, element, model) if element?
       element
     else
       if subtemplate = find(@subtemplates, (f) -> f.canBuild(model))
@@ -25,6 +31,12 @@ class Template
 
   canBuild: (model) ->
     @name is model.constructor.name
+
+  buildBinding: (type, element, model, propertyName) ->
+    if BindingClass = @bindingClasses[type]
+      new BindingClass(element, model, propertyName)
+    else
+      @parent?.buildBinding(type, element, model, propertyName)
 
   buildFragment: (model) ->
     switch typeof @content

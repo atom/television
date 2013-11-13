@@ -2,7 +2,7 @@ TextBinding = require './bindings/text-binding'
 
 module.exports =
 class View
-  constructor: (@element, @model) ->
+  constructor: (@template, @element, @model) ->
     @bindings = []
     @createBindings(@element)
 
@@ -11,7 +11,5 @@ class View
 
     for attribute in element.attributes
       if match = attribute.name.match(/^tv-(.*)/)
-        bindingName = match[1]
-        switch bindingName
-          when 'text'
-            @bindings.push(new TextBinding(element, @model, attribute.value))
+        bindingType = match[1]
+        @template.buildBinding(bindingType, element, @model, attribute.value)
