@@ -17,25 +17,25 @@ describe "Television", ->
       tv.Blog.register("Post", content: "<div>Post</div>")
       tv.Blog.register("Comment", content: "<div>Comment</div>")
 
-    describe "when the receiving template can build a view for the given model", ->
+    describe "when the receiving template can visualize the given model", ->
       it "constructs a view for itself", ->
-        expect(tv.Blog.build(new Blog).outerHTML).toBe "<div>Blog</div>"
+        expect(tv.Blog.visualize(new Blog).outerHTML).toBe "<div>Blog</div>"
 
-    describe "when the receiving template cannot build a view for the given model", ->
-      describe "when it has a subtemplate that can build a view for the given model", ->
+    describe "when the receiving template cannot visualize the given model", ->
+      describe "when it has a subtemplate that can visualize the given model", ->
         it "delegates construction to the subtemplate", ->
-          expect(tv.Blog.build(new Post).outerHTML).toBe "<div>Post</div>"
-          expect(tv.Blog.build(new Comment).outerHTML).toBe "<div>Comment</div>"
+          expect(tv.Blog.visualize(new Post).outerHTML).toBe "<div>Post</div>"
+          expect(tv.Blog.visualize(new Comment).outerHTML).toBe "<div>Comment</div>"
 
-      describe "when it does *not* have a subtemplate that can build a view for the the model model", ->
+      describe "when it does *not* have a subtemplate that can visualize the the model model", ->
         describe "when it has a parent template", ->
           it "delegates the call to its parent", ->
-            expect(tv.Blog.Post.build(new Comment).outerHTML).toBe "<div>Comment</div>"
+            expect(tv.Blog.Post.visualize(new Comment).outerHTML).toBe "<div>Comment</div>"
 
         describe "when it is the root template", ->
           it "returns undefined", ->
             class Favorite
-            expect(tv.build(new Favorite)).toBeUndefined()
+            expect(tv.visualize(new Favorite)).toBeUndefined()
 
   describe "element construction", ->
     beforeEach ->
@@ -44,7 +44,7 @@ describe "Television", ->
     describe "when the content property is a string", ->
       it "parses the string to a DOM fragment", ->
         tv.Blog.content = "<div>Blog</div>"
-        expect(tv.build(new Blog).outerHTML).toBe "<div>Blog</div>"
+        expect(tv.visualize(new Blog).outerHTML).toBe "<div>Blog</div>"
 
     describe "when the content property is already a DOM fragment", ->
       it "clones the fragment", ->
@@ -53,7 +53,7 @@ describe "Television", ->
         contentFragment = div.firstChild
         tv.Blog.content = contentFragment
 
-        fragment = tv.build(new Blog)
+        fragment = tv.visualize(new Blog)
         expect(fragment.outerHTML).toBe contentFragment.outerHTML
         expect(fragment).not.toBe contentFragment
 
@@ -61,13 +61,13 @@ describe "Television", ->
       it "calls the function with the model", ->
         tv.Blog.content = jasmine.createSpy("template.content")
         blog = new Blog
-        tv.build(blog)
+        tv.visualize(blog)
         expect(tv.Blog.content).toHaveBeenCalledWith(blog)
 
       describe "when the function returns a string", ->
         it "parses the string as a DOM fragment", ->
           tv.Blog.content = -> "<div>Blog!</div>"
-          expect(tv.build(new Blog).outerHTML).toBe "<div>Blog!</div>"
+          expect(tv.visualize(new Blog).outerHTML).toBe "<div>Blog!</div>"
 
       describe "when the function returns a DOM fragment", ->
         it "returns the DOM fragment", ->
@@ -75,12 +75,12 @@ describe "Television", ->
           div.innerHTML = "<div>Blog!</div>"
           contentFragment = div.firstChild
           tv.Blog.content = -> contentFragment
-          expect(tv.build(new Blog)).toBe contentFragment
+          expect(tv.visualize(new Blog)).toBe contentFragment
 
       describe "when the function calls HTML tag methods", ->
         it "returns a DOM fragment based on the called tag methods", ->
           tv.Blog.content = -> @div => @h1 "Hello World!"
-          expect(tv.build(new Blog).outerHTML).toBe "<div><h1>Hello World!</h1></div>"
+          expect(tv.visualize(new Blog).outerHTML).toBe "<div><h1>Hello World!</h1></div>"
 
   describe "bindings", ->
     describe "text", ->
@@ -90,7 +90,7 @@ describe "Television", ->
           @div => @h1 'x-bind-text': "title"
 
         blog = Blog.createAsRoot(title: "Alpha")
-        node = tv.build(blog)
+        node = tv.visualize(blog)
         expect(node.outerHTML).toBe '<div><h1 x-bind-text="title">Alpha</h1></div>'
         blog.title = "Beta"
         expect(node.outerHTML).toBe '<div><h1 x-bind-text="title">Beta</h1></div>'
@@ -112,5 +112,5 @@ describe "Television", ->
         comment = new Comment(title: "Hello")
         blog = Blog.createAsRoot(featuredItem: post)
 
-        element = tv.build(blog)
+        element = tv.visualize(blog)
         expect(element.outerHTML).toBe '<div><h1>Featured Item</h1><div id="post" x-bind-text="title">Alpha</div></div>'

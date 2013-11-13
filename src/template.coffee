@@ -19,18 +19,18 @@ class Template
   registerBinder: (binder) ->
     @binders[binder.type] = binder
 
-  build: (model) ->
-    if @canBuild(model)
+  visualize: (model) ->
+    if @canVisualize(model)
       element = @buildFragment(model)
       new View(this, element, model) if element?
       element
     else
-      if subtemplate = find(@subtemplates, (f) -> f.canBuild(model))
-        subtemplate.build(model)
+      if subtemplate = find(@subtemplates, (f) -> f.canVisualize(model))
+        subtemplate.visualize(model)
       else
-        @parent?.build(model)
+        @parent?.visualize(model)
 
-  canBuild: (model) ->
+  canVisualize: (model) ->
     @name is model.constructor.name
 
   buildBinding: (type, element, model, propertyName) ->
