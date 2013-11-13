@@ -13,9 +13,9 @@ describe "Television", ->
 
   describe "template selection", ->
     beforeEach ->
-      tv.addTemplate("Blog", content: "<div>Blog</div>")
-      tv.Blog.addTemplate("Post", content: "<div>Post</div>")
-      tv.Blog.addTemplate("Comment", content: "<div>Comment</div>")
+      tv.register("Blog", content: "<div>Blog</div>")
+      tv.Blog.register("Post", content: "<div>Post</div>")
+      tv.Blog.register("Comment", content: "<div>Comment</div>")
 
     describe "when the receiving template can build a view for the given model", ->
       it "constructs a view for itself", ->
@@ -39,7 +39,7 @@ describe "Television", ->
 
   describe "element construction", ->
     beforeEach ->
-      tv.addTemplate("Blog")
+      tv.register("Blog")
 
     describe "when the content property is a string", ->
       it "parses the string to a DOM fragment", ->
@@ -86,7 +86,7 @@ describe "Television", ->
     describe "text", ->
       it "replaces the bound element's text content with the value of the bound property", ->
         Blog.property 'title'
-        tv.addTemplate 'Blog', content: ->
+        tv.register 'Blog', content: ->
           @div => @h1 'tv-text': "title"
 
         blog = Blog.createAsRoot(title: "Alpha")
@@ -101,12 +101,12 @@ describe "Television", ->
         Post.property 'title'
         Comment.property 'body'
 
-        tv.addTemplate 'Blog', content: ->
+        tv.register 'Blog', content: ->
           @div =>
             @h1 "Featured Item"
             @div 'tv-component': "featuredItem"
-        tv.addTemplate 'Post', content: -> @div id: 'post', 'tv-text': 'title'
-        tv.addTemplate 'Comment', content: -> @div id: 'comment', 'tv-text': 'body'
+        tv.register 'Post', content: -> @div id: 'post', 'tv-text': 'title'
+        tv.register 'Comment', content: -> @div id: 'comment', 'tv-text': 'body'
 
         post = new Post(title: "Alpha")
         comment = new Comment(title: "Hello")

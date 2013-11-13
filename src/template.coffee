@@ -11,7 +11,7 @@ class Template
       @addBindingClass(require './bindings/text-binding')
       @addBindingClass(require './bindings/component-binding')
 
-  addTemplate: (name, params) ->
+  register: (name, params) ->
     subtemplate = new @constructor(extend({name, parent: this}, params))
     @subtemplates.push(subtemplate)
     @[name] = subtemplate
