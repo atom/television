@@ -6,18 +6,18 @@ module.exports =
 class Template
   constructor: ({@name, @content, @parent}={}) ->
     @subtemplates = []
-    @bindingClasses = {}
+    @binders = {}
     unless @parent?
-      @addBindingClass(require './bindings/text-binding')
-      @addBindingClass(require './bindings/component-binding')
+      @registerBinder(require './bindings/text-binding')
+      @registerBinder(require './bindings/component-binding')
 
   register: (name, params) ->
     subtemplate = new @constructor(extend({name, parent: this}, params))
     @subtemplates.push(subtemplate)
     @[name] = subtemplate
 
-  addBindingClass: (bindingClass) ->
-    @bindingClasses[bindingClass.type] = bindingClass
+  registerBinder: (binder) ->
+    @binders[binder.type] = binder
 
   build: (model) ->
     if @canBuild(model)
@@ -34,8 +34,8 @@ class Template
     @name is model.constructor.name
 
   buildBinding: (type, element, model, propertyName) ->
-    if BindingClass = @bindingClasses[type]
-      new BindingClass(this, element, model, propertyName)
+    if binder = @binders[type]
+      binder.bind(this, element, model, propertyName)
     else
       @parent?.buildBinding(type, element, model, propertyName)
 
