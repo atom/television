@@ -1,9 +1,7 @@
-{Subscriber} = require 'emissary'
+Binding = require './binding'
 
 module.exports =
-class TextBinding
-  Subscriber.includeInto(this)
-
+class TextBinding extends Binding
   @type: 'text'
 
   constructor: (@element, @model, @propertyName) ->
