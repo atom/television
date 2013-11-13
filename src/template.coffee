@@ -9,6 +9,7 @@ class Template
     @bindingClasses = {}
     unless @parent?
       @addBindingClass(require './bindings/text-binding')
+      @addBindingClass(require './bindings/component-binding')
 
   addTemplate: (name, params) ->
     subtemplate = new @constructor(extend({name, parent: this}, params))
@@ -34,7 +35,7 @@ class Template
 
   buildBinding: (type, element, model, propertyName) ->
     if BindingClass = @bindingClasses[type]
-      new BindingClass(element, model, propertyName)
+      new BindingClass(this, element, model, propertyName)
     else
       @parent?.buildBinding(type, element, model, propertyName)
 

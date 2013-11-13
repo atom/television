@@ -94,3 +94,23 @@ describe "Television", ->
         expect(node.outerHTML).toBe '<div><h1 tv-text="title">Alpha</h1></div>'
         blog.title = "Beta"
         expect(node.outerHTML).toBe '<div><h1 tv-text="title">Beta</h1></div>'
+
+    describe "component", ->
+      it "replaces the bound element with a view based on the value of the bound property", ->
+        Blog.property 'featuredItem'
+        Post.property 'title'
+        Comment.property 'body'
+
+        tv.addTemplate 'Blog', content: ->
+          @div =>
+            @h1 "Featured Item"
+            @div 'tv-component': "featuredItem"
+        tv.addTemplate 'Post', content: -> @div id: 'post', 'tv-text': 'title'
+        tv.addTemplate 'Comment', content: -> @div id: 'comment', 'tv-text': 'body'
+
+        post = new Post(title: "Alpha")
+        comment = new Comment(title: "Hello")
+        blog = Blog.createAsRoot(featuredItem: post)
+
+        element = tv.build(blog)
+        expect(element.outerHTML).toBe '<div><h1>Featured Item</h1><div id="post" tv-text="title">Alpha</div></div>'

@@ -1,3 +1,4 @@
+{toArray} = require 'underscore'
 TextBinding = require './bindings/text-binding'
 
 module.exports =
@@ -7,7 +8,8 @@ class View
     @createBindings(@element)
 
   createBindings: (element) ->
-    @createBindings(element) for element in element.children
+    for child in element.children
+      @createBindings(child)
 
     for attribute in element.attributes
       if match = attribute.name.match(/^tv-(.*)/)
