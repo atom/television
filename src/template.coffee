@@ -59,3 +59,8 @@ class Template
     div = window.document.createElement('div')
     div.innerHTML = string
     div.firstChild
+
+  buildHTML: (args..., fn) ->
+    builder = new HTMLBuilder
+    result = fn.call(builder, args...)
+    builder.toHTML()
