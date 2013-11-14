@@ -8,16 +8,16 @@ class Template
     @subtemplates = []
     @binders = {}
     unless @parent?
-      @registerBinder(require './bindings/text-binding')
-      @registerBinder(require './bindings/component-binding')
+      @registerBinder('text', require('./bindings/text-binding'))
+      @registerBinder('component', require('./bindings/component-binding'))
 
   register: (name, params) ->
     subtemplate = new @constructor(extend({name, parent: this}, params))
     @subtemplates.push(subtemplate)
     @[name] = subtemplate
 
-  registerBinder: (binder) ->
-    @binders[binder.type] = binder
+  registerBinder: (type, binder) ->
+    @binders[type] = binder
 
   visualize: (model) ->
     if @canVisualize(model)
