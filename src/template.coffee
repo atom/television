@@ -10,6 +10,7 @@ class Template
     unless @parent?
       @registerBinder('text', require('./bindings/text-binding'))
       @registerBinder('component', require('./bindings/component-binding'))
+      @registerBinder('collection', require('./bindings/collection-binding'))
 
   register: (name, params) ->
     subtemplate = new @constructor(extend({name, parent: this}, params))
