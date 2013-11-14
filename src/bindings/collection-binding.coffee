@@ -17,8 +17,6 @@ class CollectionBinding extends Binding
     @element.appendChild(@visualizeModels(@collection.getValues()))
     @subscribe @collection, 'changed', ({index, removedValues, insertedValues}) =>
       times removedValues.length, => @element.removeChild(@element.children[index])
-
-
       @element.insertBefore(@visualizeModels(insertedValues), @element.children[index])
 
   visualizeModels: (models) ->
