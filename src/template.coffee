@@ -19,6 +19,9 @@ class Template
   registerBinder: (type, binder) ->
     @binders[type] = binder
 
+  getBinder: (type) ->
+    @binders[type] ? @parent?.getBinder(type)
+
   visualize: (model) ->
     if @canVisualize(model)
       element = @buildFragment(model)
@@ -34,10 +37,8 @@ class Template
     @name is model.constructor.name
 
   bind: (type, element, model, propertyName) ->
-    if binder = @binders[type]
+    if binder = @getBinder(type)
       binder.bind(this, element, model, propertyName)
-    else
-      @parent?.bind(type, element, model, propertyName)
 
   buildFragment: (model) ->
     switch typeof @content
