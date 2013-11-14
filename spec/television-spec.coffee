@@ -2,13 +2,12 @@
 television = require '../src/television'
 
 describe "Television", ->
-  class Blog extends Model
-  class Post extends Model
-  class Comment extends Model
-
-  tv = null
+  [tv, Blog, Post, Comment] = []
 
   beforeEach ->
+    class Blog extends Model
+    class Post extends Model
+    class Comment extends Model
     tv = television()
 
   describe "template selection", ->
