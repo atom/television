@@ -1,4 +1,4 @@
-{Model} = require 'telepath'
+{Model, Document} = require 'telepath'
 television = require '../src/television'
 
 describe "Television", ->
@@ -85,9 +85,15 @@ describe "Television", ->
     it "recycles existing views if they aren't currently attached to some other view", ->
       tv.register "Blog", content: "<div x-bind-text='title'></div>"
       Blog.property 'title'
-      blog = Blog.createAsRoot(title: "Alpha")
+
+      doc = Document.create()
+      blog = doc.set('blog', new Blog(title: "Alpha"))
+
+      expect(blog.state.getSubscriptionCount('changed')).toBe 0
 
       blogElement1 = tv.visualize(blog)
+
+      expect(blog.state.getSubscriptionCount('changed')).toBe 1
 
       expect(tv.visualize(blog)).toBe blogElement1
 
@@ -104,3 +110,8 @@ describe "Television", ->
 
       parentElement.removeChild(blogElement1)
       expect(tv.visualize(blog)).toBe blogElement1
+
+      # clear out cache when the model is detached
+      doc.remove('blog')
+      expect(tv.Blog.getCachedElement(blog)).toBeUndefined()
+      expect(blog.state.getSubscriptionCount()).toBe 0

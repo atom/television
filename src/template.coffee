@@ -1,9 +1,12 @@
 {extend, find} = require 'underscore'
+{Subscriber} = require 'emissary'
 HTMLBuilder = require './html-builder'
 View = require './view'
 
 module.exports =
 class Template
+  Subscriber.includeInto(this)
+
   constructor: ({@name, @content, @parent}={}) ->
     @subtemplates = []
     @binders = {}
@@ -48,6 +51,11 @@ class Template
     @viewCache.set(model, []) unless @viewCache.has(model)
     @viewCache.get(model).push(view)
 
+    @subscribe view, 'destroyed', =>
+      views = @viewCache.get(model)
+      views.splice(views.indexOf(view), 1)
+
+
   getCachedElement: (model) ->
     if views = @viewCache.get(model)
       for {element} in views
@@ -57,6 +65,10 @@ class Template
   bind: (type, element, model, propertyName) ->
     if binder = @getBinder(type)
       binder.bind(this, element, model, propertyName)
+
+  unbind: (type, binding) ->
+    if binder = @getBinder(type)
+      binder.unbind(binding)
 
   buildFragment: (model) ->
     switch typeof @content
