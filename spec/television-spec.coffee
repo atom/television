@@ -58,7 +58,7 @@ describe "Television", ->
 
     describe "when the content property is a function", ->
       it "calls the function with the model", ->
-        tv.Blog.content = jasmine.createSpy("template.content")
+        tv.Blog.content = jasmine.createSpy("template.content").andReturn "<div></div>"
         blog = new Blog
         tv.visualize(blog)
         expect(tv.Blog.content).toHaveBeenCalledWith(blog)
@@ -80,3 +80,27 @@ describe "Television", ->
         it "returns a DOM fragment based on the called tag methods", ->
           tv.Blog.content = -> @div => @h1 "Hello World!"
           expect(tv.visualize(new Blog).outerHTML).toBe "<div><h1>Hello World!</h1></div>"
+
+  describe "caching", ->
+    it "recycles existing views if they aren't currently attached to some other view", ->
+      tv.register "Blog", content: "<div x-bind-text='title'></div>"
+      Blog.property 'title'
+      blog = Blog.createAsRoot(title: "Alpha")
+
+      blogElement1 = tv.visualize(blog)
+
+      expect(tv.visualize(blog)).toBe blogElement1
+
+      parentElement = window.document.createElement("div")
+      parentElement.appendChild(blogElement1)
+
+      blogElement2 = tv.visualize(blog)
+      expect(blogElement2).not.toBe blogElement1
+      expect(tv.visualize(blog)).toBe blogElement2
+
+      parentElement.appendChild(blogElement2)
+      expect(tv.visualize(blog)).not.toBe blogElement1
+      expect(tv.visualize(blog)).not.toBe blogElement2
+
+      parentElement.removeChild(blogElement1)
+      expect(tv.visualize(blog)).toBe blogElement1

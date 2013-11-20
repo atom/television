@@ -7,6 +7,7 @@ class Template
   constructor: ({@name, @content, @parent}={}) ->
     @subtemplates = []
     @binders = {}
+    @viewCache = new WeakMap
     unless @parent?
       @registerBinder('text', require('./bindings/text-binding'))
       @registerBinder('component', require('./bindings/component-binding'))
@@ -24,10 +25,15 @@ class Template
     @binders[type] ? @parent?.getBinder(type)
 
   visualize: (model) ->
-    if @canVisualize(model)
-      element = @buildFragment(model)
-      new View(this, element, model) if element?
+    if element = @getCachedElement(model)
       element
+    else if @canVisualize(model)
+      if element = @buildFragment(model)
+        view = new View(this, element, model)
+        @cacheView(view)
+        element
+      else
+        throw new Error("Template did not specify content")
     else
       if subtemplate = find(@subtemplates, (f) -> f.canVisualize(model))
         subtemplate.visualize(model)
@@ -36,6 +42,17 @@ class Template
 
   canVisualize: (model) ->
     @name is model.constructor.name
+
+  cacheView: (view) ->
+    {model} = view
+    @viewCache.set(model, []) unless @viewCache.has(model)
+    @viewCache.get(model).push(view)
+
+  getCachedElement: (model) ->
+    if views = @viewCache.get(model)
+      for {element} in views
+        return element unless element.parentNode?
+    undefined
 
   bind: (type, element, model, propertyName) ->
     if binder = @getBinder(type)
@@ -60,7 +77,9 @@ class Template
   parseHTML: (string) ->
     div = window.document.createElement('div')
     div.innerHTML = string
-    div.firstChild
+    element = div.firstChild
+    div.removeChild(element)
+    element
 
   buildHTML: (args..., fn) ->
     builder = new HTMLBuilder
