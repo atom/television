@@ -1,25 +1,25 @@
 {Model, Document} = require 'telepath'
-television = require '../src/television'
+ViewFactory = require '../src/view-factory'
+{parseHTML} = ViewFactory::
 
 describe "ViewFactory", ->
-  [tv, Blog, Post, Comment] = []
+  [Blog, Post, Comment] = []
 
   beforeEach ->
     class Blog extends Model
     class Post extends Model
     class Comment extends Model
-    tv = television()
 
   describe "factory selection based on the model's constructor", ->
     it "selects the current factory if matches the model and otherwise delegates to an immediate child or an ancestor", ->
-      tv.register(name: "BlogView", content: "<div>Blog</div>")
-      tv.BlogView.register(name: "PostView", content: "<div>Post</div>")
-      tv.BlogView.register(name: "CommentView", content: "<div>Comment</div>")
+      factory = new ViewFactory(name: "BlogView", content: "<div>Blog</div>")
+      factory.register(name: "PostView", content: "<div>Post</div>")
+      factory.register(name: "CommentView", content: "<div>Comment</div>")
 
-      expect(tv.viewForModel(new Blog).element.textContent).toBe "Blog"
-      expect(tv.BlogView.viewForModel(new Blog).element.textContent).toBe "Blog"
-      expect(tv.BlogView.viewForModel(new Post).element.textContent).toBe "Post"
-      expect(tv.BlogView.CommentView.viewForModel(new Post).element.textContent).toBe "Post"
+      expect(factory.viewForModel(new Blog).element.textContent).toBe "Blog"
+      expect(factory.viewForModel(new Post).element.textContent).toBe "Post"
+      expect(factory.CommentView.viewForModel(new Blog).element.textContent).toBe "Blog"
+      expect(factory.CommentView.viewForModel(new Post).element.textContent).toBe "Post"
 
   describe "element construction based on the 'content' property", ->
     blog = null
@@ -29,13 +29,13 @@ describe "ViewFactory", ->
 
     describe "if the factory's 'content' property is a string", ->
       it "parses the string as HTML", ->
-        factory = tv.buildViewFactory(name: "BlogView", content: "<div>Blog</div>")
+        factory = new ViewFactory(name: "BlogView", content: "<div>Blog</div>")
         {element} = factory.viewForModel(blog)
         expect(element.outerHTML).toBe "<div>Blog</div>"
 
     describe "if the factory's 'content' property is an element", ->
       it "clones the element", ->
-        factory = tv.buildViewFactory(name: "BlogView", content: tv.parseHTML("<div>Blog</div>"))
+        factory = new ViewFactory(name: "BlogView", content: parseHTML("<div>Blog</div>"))
         {element} = factory.viewForModel(blog)
         expect(element.outerHTML).toBe "<div>Blog</div>"
         expect(element).not.toBe factory.content
@@ -43,26 +43,26 @@ describe "ViewFactory", ->
     describe "if the factory's 'content' property is a function", ->
       it "passes the model object to the function", ->
         contentFn = jasmine.createSpy("content").andReturn("<div>Blog</div>")
-        factory = tv.buildViewFactory(name: "BlogView", content: contentFn)
+        factory = new ViewFactory(name: "BlogView", content: contentFn)
         factory.viewForModel(blog)
         expect(contentFn).toHaveBeenCalledWith(blog)
 
       describe "if the function returns a string", ->
         it "parses the string as HTML", ->
-          factory = tv.buildViewFactory(name: "BlogView", content: -> "<div>Blog</div>")
+          factory = new ViewFactory(name: "BlogView", content: -> "<div>Blog</div>")
           {element} = factory.viewForModel(blog)
           expect(element.outerHTML).toBe "<div>Blog</div>"
 
       describe "if the function returns an element", ->
         it "builds the view with the returned element", ->
-          contentElement = tv.parseHTML("<div>Blog</div>")
-          factory = tv.buildViewFactory(name: "BlogView", content: -> contentElement)
+          contentElement = parseHTML("<div>Blog</div>")
+          factory = new ViewFactory(name: "BlogView", content: -> contentElement)
           {element} = factory.viewForModel(blog)
           expect(element).toBe contentElement
 
       describe "if the function calls HTML builder DSL methods", ->
         it "builds the element based on the described HTML", ->
-          factory = tv.buildViewFactory
+          factory = new ViewFactory
             name: "BlogView"
             content: ->
               @div =>
@@ -76,7 +76,7 @@ describe "ViewFactory", ->
       doc = Document.create()
       blog = doc.set('blog', new Blog(title: "Alpha"))
 
-      factory = tv.buildViewFactory(name: "BlogView", content: "<div x-bind-text='title'></div>")
+      factory = new ViewFactory(name: "BlogView", content: "<div x-bind-text='title'></div>")
 
       expect(blog.state.getSubscriptionCount('changed')).toBe 0
 
