@@ -1,4 +1,4 @@
-{extend, find} = require 'underscore'
+{find, clone} = require 'underscore'
 {Subscriber} = require 'emissary'
 HTMLBuilder = require './html-builder'
 View = require './view'
@@ -16,10 +16,14 @@ class Template
       @registerBinder('component', require('./bindings/component-binding'))
       @registerBinder('collection', require('./bindings/collection-binding'))
 
-  register: (name, params) ->
-    subtemplate = new @constructor(extend({name, parent: this}, params))
+  register: (args...) ->
+    name = args.shift() if typeof args[0] is 'string'
+    params = clone(args.shift()) ? {}
+    params.name = name if name?
+    params.parent = this
+    subtemplate = new @constructor(params)
     @subtemplates.push(subtemplate)
-    @[name] = subtemplate
+    @[subtemplate.name] = subtemplate
 
   registerBinder: (type, binder) ->
     @binders[type] = binder

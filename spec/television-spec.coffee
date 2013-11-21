@@ -12,9 +12,9 @@ describe "Television", ->
 
   describe "template selection", ->
     beforeEach ->
-      tv.register("Blog", content: "<div>Blog</div>")
-      tv.Blog.register("Post", content: "<div>Post</div>")
-      tv.Blog.register("Comment", content: "<div>Comment</div>")
+      tv.register(name: "Blog", content: "<div>Blog</div>")
+      tv.Blog.register(name: "Post", content: "<div>Post</div>")
+      tv.Blog.register(name: "Comment", content: "<div>Comment</div>")
 
     describe "when the receiving template can visualize the given model", ->
       it "constructs a view for itself", ->
