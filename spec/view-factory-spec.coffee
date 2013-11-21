@@ -104,3 +104,31 @@ describe "ViewFactory", ->
       doc.remove('blog')
       expect(factory.getCachedView(blog)).toBeUndefined()
       expect(blog.state.getSubscriptionCount()).toBe 0
+
+  describe "custom view properties", ->
+    it "extends the constructed view with properties registered on the factory", ->
+      factory = new ViewFactory
+        name: "BlogView"
+        content: "<div>Blog</div>"
+        foo: -> @fooCalled = true
+
+      view = factory.viewForModel(new Blog)
+      expect(view.foo()).toBe true
+      expect(view.fooCalled).toBe true
+
+    it "calls ::created and ::destroyed hooks when the view is created/destroyed", ->
+      factory = new ViewFactory
+        name: "BlogView"
+        content: "<div>Blog</div>"
+        created: -> @createdCalled = true
+        destroyed: -> @destroyedCalled = true
+
+      doc = Document.create()
+      blog = doc.set('blog', new Blog)
+
+      view = factory.viewForModel(blog)
+      expect(view.createdCalled).toBe true
+      expect(view.destroyedCalled).toBeUndefined()
+
+      doc.remove('blog')
+      expect(view.destroyedCalled).toBe true

@@ -1,4 +1,4 @@
-{find, clone} = require 'underscore'
+{find, clone, omit, extend} = require 'underscore'
 Mixin = require 'mixto'
 {Subscriber} = require 'emissary'
 HTMLBuilder = require './html-builder'
@@ -7,7 +7,9 @@ module.exports =
 class ViewFactory extends Mixin
   Subscriber.includeInto(this)
 
-  constructor: ({@name, @content, @parent}={}) ->
+  constructor: (params={}) ->
+    {@name, @content, @parent} = params
+    @viewProperties = omit(params, 'name', 'content', 'parent')
     @registerDefaultBinders()
 
   extended: ->
@@ -48,7 +50,7 @@ class ViewFactory extends Mixin
       view
     else if @canBuildViewForModel(model)
       if element = @buildElement(model)
-        @cacheView(new View(model, element, this))
+        @cacheView(new View(model, element, this, @viewProperties))
       else
         throw new Error("Template did not specify content")
     else

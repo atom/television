@@ -1,4 +1,4 @@
-{toArray} = require 'underscore'
+{toArray, extend} = require 'underscore'
 {Emitter} = require 'emissary'
 ViewFactory = require './view-factory'
 
@@ -7,7 +7,7 @@ class View
   ViewFactory.extend(this)
   Emitter.includeInto(this)
 
-  constructor: (@model, @element, @template) ->
+  constructor: (@model, @element, @template, customProperties) ->
     unless @element?
       if @constructor.canBuildViewForModel(model)
         @element = @constructor.buildElement(model)
@@ -16,9 +16,11 @@ class View
       else
         throw new Error("This view is not compatible with the given model")
 
+    extend(this, customProperties) if customProperties?
     @bindings = []
     @createBindings(@element)
     @model.on 'detached', => @destroy()
+    @created?()
 
   createBindings: (element) ->
     for child in element.children
@@ -34,4 +36,5 @@ class View
   destroy: ->
     for [bindingType, binding] in @bindings
       @template.unbind(bindingType, binding)
+    @destroyed?()
     @emit 'destroyed'
