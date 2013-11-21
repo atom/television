@@ -14,19 +14,23 @@ describe "CollectionBinding", ->
     Blog.property 'posts'
     Post.property 'title'
 
-    tv.register 'Blog', content: ->
-      @div =>
-        @h1 "My Posts:"
-        @ol 'x-bind-collection': "posts"
-    tv.Blog.register 'Post', content: ->
-      @li 'x-bind-text': "title"
+    tv.register
+      name: 'BlogView'
+      content: ->
+        @div =>
+          @h1 "My Posts:"
+          @ol 'x-bind-collection': "posts"
+    tv.BlogView.register
+      name: 'PostView',
+      content: ->
+        @li 'x-bind-text': "title"
 
     post1 = new Post(title: "Alpha")
     post2 = new Post(title: "Bravo")
     post3 = new Post(title: "Charlie")
     blog = Blog.createAsRoot(posts: [post1, post2, post3])
 
-    element = tv.visualize(blog)
+    {element} = tv.viewForModel(blog)
     expect(element.outerHTML).toBe tv.buildHTML ->
       @div =>
         @h1 "My Posts:"

@@ -1,2 +1,1 @@
-Template = require './template'
-module.exports = -> new Template
+module.exports = -> new (require './view-factory')

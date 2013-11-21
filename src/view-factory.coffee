@@ -4,11 +4,11 @@ HTMLBuilder = require './html-builder'
 View = require './view'
 
 module.exports =
-class Template
+class ViewFactory
   Subscriber.includeInto(this)
 
   constructor: ({@name, @content, @parent}={}) ->
-    @subtemplates = []
+    @childFactories = []
     @binders = {}
     @viewCache = new WeakMap
     unless @parent?
@@ -16,14 +16,15 @@ class Template
       @registerBinder('component', require('./bindings/component-binding'))
       @registerBinder('collection', require('./bindings/collection-binding'))
 
-  register: (args...) ->
-    name = args.shift() if typeof args[0] is 'string'
-    params = clone(args.shift()) ? {}
-    params.name = name if name?
+  buildViewFactory: (params) ->
+    new @constructor(params)
+
+  register: (params) ->
+    params = clone(params)
     params.parent = this
-    subtemplate = new @constructor(params)
-    @subtemplates.push(subtemplate)
-    @[subtemplate.name] = subtemplate
+    factory = new @constructor(params)
+    @childFactories.push(factory)
+    @[factory.name] = factory
 
   registerBinder: (type, binder) ->
     @binders[type] = binder
@@ -31,40 +32,34 @@ class Template
   getBinder: (type) ->
     @binders[type] ? @parent?.getBinder(type)
 
-  visualize: (model) ->
-    if element = @getCachedElement(model)
-      element
-    else if @canVisualize(model)
-      if element = @buildFragment(model)
-        view = new View(this, element, model)
-        @cacheView(view)
-        element
+  viewForModel: (model) ->
+    if view = @getCachedView(model)
+      view
+    else if @canBuildViewForModel(model)
+      if element = @buildElement(model)
+        @cacheView(new View(this, element, model))
       else
         throw new Error("Template did not specify content")
     else
-      if subtemplate = find(@subtemplates, (f) -> f.canVisualize(model))
-        subtemplate.visualize(model)
+      if childFactory = find(@childFactories, (f) -> f.canBuildViewForModel(model))
+        childFactory.viewForModel(model)
       else
-        @parent?.visualize(model)
+        @parent?.viewForModel(model)
 
-  canVisualize: (model) ->
-    @name is model.constructor.name
+  canBuildViewForModel: (model) ->
+    @name is "#{model.constructor.name}View"
 
   cacheView: (view) ->
     {model} = view
     @viewCache.set(model, []) unless @viewCache.has(model)
-    @viewCache.get(model).push(view)
+    views = @viewCache.get(model)
+    @subscribe view, 'destroyed', => views.splice(views.indexOf(view), 1)
+    views.push(view)
+    view
 
-    @subscribe view, 'destroyed', =>
-      views = @viewCache.get(model)
-      views.splice(views.indexOf(view), 1)
-
-
-  getCachedElement: (model) ->
+  getCachedView: (model) ->
     if views = @viewCache.get(model)
-      for {element} in views
-        return element unless element.parentNode?
-    undefined
+      find views, (view) -> not view.element.parentNode?
 
   bind: (type, element, model, propertyName) ->
     if binder = @getBinder(type)
@@ -74,7 +69,7 @@ class Template
     if binder = @getBinder(type)
       binder.unbind(binding)
 
-  buildFragment: (model) ->
+  buildElement: (model) ->
     switch typeof @content
       when 'string'
         @parseHTML(@content)

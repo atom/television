@@ -14,14 +14,14 @@ class CollectionBinding extends Binding
     @collection = collection
 
     @element.innerHTML = ''
-    @element.appendChild(@visualizeModels(@collection.getValues()))
+    @element.appendChild(@elementsForModels(@collection.getValues()))
     @subscribe @collection, 'changed', ({index, removedValues, insertedValues}) =>
       times removedValues.length, => @element.removeChild(@element.children[index])
-      @element.insertBefore(@visualizeModels(insertedValues), @element.children[index])
+      @element.insertBefore(@elementsForModels(insertedValues), @element.children[index])
 
-  visualizeModels: (models) ->
+  elementsForModels: (models) ->
     fragment = window.document.createDocumentFragment()
     for model in models
-      if element = @template.visualize(model)
+      if {element} = @template.viewForModel(model)
         fragment.appendChild(element)
     fragment
