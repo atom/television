@@ -10,8 +10,8 @@ describe "ViewFactory", ->
     class Post extends Model
     class Comment extends Model
 
-  describe "factory selection based on the model's constructor", ->
-    it "selects the current factory if matches the model and otherwise delegates to an immediate child or an ancestor", ->
+  describe "view construction", ->
+    it "builds the view with the current factory if it matches the model, but otherwise delegates to a matching immediate child or its parent", ->
       factory = new ViewFactory(name: "BlogView", content: "<div>Blog</div>")
       factory.register(name: "PostView", content: "<div>Post</div>")
       factory.register(name: "CommentView", content: "<div>Comment</div>")

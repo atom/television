@@ -1,47 +1,58 @@
 {find, clone} = require 'underscore'
+Mixin = require 'mixto'
 {Subscriber} = require 'emissary'
 HTMLBuilder = require './html-builder'
-View = require './view'
 
 module.exports =
-class ViewFactory
+class ViewFactory extends Mixin
   Subscriber.includeInto(this)
 
   constructor: ({@name, @content, @parent}={}) ->
-    @childFactories = []
-    @binders = {}
-    @viewCache = new WeakMap
-    unless @parent?
-      @registerBinder('text', require('./bindings/text-binding'))
-      @registerBinder('component', require('./bindings/component-binding'))
-      @registerBinder('collection', require('./bindings/collection-binding'))
+    @registerDefaultBinders()
+
+  extended: ->
+    @registerDefaultBinders()
+
+  registerDefaultBinders: ->
+    @registerBinder('text', require('./bindings/text-binding'))
+    @registerBinder('component', require('./bindings/component-binding'))
+    @registerBinder('collection', require('./bindings/collection-binding'))
+
+  getBinders: ->
+    @binders ?= {}
+
+  getChildFactories: ->
+    @childFactories ?= []
+
+  getViewCache: ->
+    @viewCache ?= new WeakMap
 
   buildViewFactory: (params) ->
     new @constructor(params)
 
-  register: (params) ->
-    params = clone(params)
-    params.parent = this
-    factory = new @constructor(params)
-    @childFactories.push(factory)
-    @[factory.name] = factory
+  register: (factories...) ->
+    for factory in factories
+      factory = new @constructor(factory) if factory.constructor is Object
+      factory.parent = this
+      @getChildFactories().push(factory)
+      @[factory.name] = factory
 
   registerBinder: (type, binder) ->
-    @binders[type] = binder
+    @getBinders()[type] = binder
 
   getBinder: (type) ->
-    @binders[type] ? @parent?.getBinder(type)
+    @getBinders()[type] ? @parent?.getBinder(type)
 
   viewForModel: (model) ->
     if view = @getCachedView(model)
       view
     else if @canBuildViewForModel(model)
       if element = @buildElement(model)
-        @cacheView(new View(this, element, model))
+        @cacheView(new View(model, element, this))
       else
         throw new Error("Template did not specify content")
     else
-      if childFactory = find(@childFactories, (f) -> f.canBuildViewForModel(model))
+      if childFactory = find(@getChildFactories(), (f) -> f.canBuildViewForModel(model))
         childFactory.viewForModel(model)
       else
         @parent?.viewForModel(model)
@@ -51,14 +62,15 @@ class ViewFactory
 
   cacheView: (view) ->
     {model} = view
-    @viewCache.set(model, []) unless @viewCache.has(model)
-    views = @viewCache.get(model)
+    viewCache = @getViewCache()
+    viewCache.set(model, []) unless viewCache.has(model)
+    views = viewCache.get(model)
     @subscribe view, 'destroyed', => views.splice(views.indexOf(view), 1)
     views.push(view)
     view
 
   getCachedView: (model) ->
-    if views = @viewCache.get(model)
+    if views = @getViewCache().get(model)
       find views, (view) -> not view.element.parentNode?
 
   bind: (type, element, model, propertyName) ->
@@ -96,3 +108,5 @@ class ViewFactory
     builder = new HTMLBuilder
     result = fn.call(builder, args...)
     builder.toHTML()
+
+View = require './view'

@@ -1,12 +1,21 @@
 {toArray} = require 'underscore'
 {Emitter} = require 'emissary'
-TextBinding = require './bindings/text-binding'
+ViewFactory = require './view-factory'
 
 module.exports =
 class View
+  ViewFactory.extend(this)
   Emitter.includeInto(this)
 
-  constructor: (@template, @element, @model) ->
+  constructor: (@model, @element, @template) ->
+    unless @element?
+      if @constructor.canBuildViewForModel(model)
+        @element = @constructor.buildElement(model)
+        @template = @constructor
+        @constructor.cacheView(this)
+      else
+        throw new Error("This view is not compatible with the given model")
+
     @bindings = []
     @createBindings(@element)
     @model.on 'detached', => @destroy()
