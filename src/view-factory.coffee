@@ -4,6 +4,7 @@ Mixin = require 'mixto'
 HTMLBuilder = require './html-builder'
 
 TextBinding = require('./bindings/text-binding')
+AttributeBinding = require('./bindings/attribute-binding')
 ComponentBinding = require('./bindings/component-binding')
 CollectionBinding = require('./bindings/collection-binding')
 
@@ -21,11 +22,12 @@ class ViewFactory extends Mixin
 
   registerDefaultBinders: ->
     @registerBinder(TextBinding)
+    @registerBinder(AttributeBinding)
     @registerBinder(ComponentBinding)
     @registerBinder(CollectionBinding)
 
   getBinders: ->
-    @binders ?= {}
+    @binders ?= []
 
   getChildFactories: ->
     @childFactories ?= []
@@ -44,10 +46,14 @@ class ViewFactory extends Mixin
       @[factory.name] = factory
 
   registerBinder: (binder) ->
-    @getBinders()[binder.type] = binder
+    @getBinders().push(binder)
 
   getBinder: (type) ->
-    @getBinders()[type] ? @parent?.getBinder(type)
+    find @getBinders(), (binder) ->
+      if typeof binder.type is 'string'
+        binder.type is type
+      else
+        binder.type.test(type)
 
   viewForModel: (model) ->
     if view = @getCachedView(model)
@@ -79,9 +85,9 @@ class ViewFactory extends Mixin
     if views = @getViewCache().get(model)
       find views, (view) -> not view.element.parentNode?
 
-  bind: (binderName, element, model, propertyName) ->
-    if binder = @getBinder(binderName)
-      binder.bind({factory: this, binderName, element, model, propertyName})
+  bind: (type, element, model, propertyName) ->
+    if binder = @getBinder(type)
+      binder.bind({factory: this, type, element, model, propertyName})
 
   unbind: (type, binding) ->
     if binder = @getBinder(type)
