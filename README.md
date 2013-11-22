@@ -132,6 +132,22 @@ name. If the value of the bound property isn't defined, the placeholder value
 of `placeholder.png` is used instead. If you don't define a placeholder value,
 the attribute will be removed when the bound value is undefined.
 
+### Style Bindings
+
+Style bindings work similarly to attribute bindings, except they bind to named
+style properties instead of attributes.
+
+```coffee
+class UserView extends View
+  @content: -> """
+    <div class="user" x-bind-style-background-color="favoriteColor"></div>
+  """
+
+view = new UserView(user)
+user.favoriteColor = "red"
+expect(view.element.style.backgroundColor).toBe "red"
+```
+
 
 ### Component Bindings
 
