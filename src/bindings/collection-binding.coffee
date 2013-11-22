@@ -1,5 +1,5 @@
 {times} = require 'underscore'
-Binding = require './binding'
+Binding = require '../binding'
 
 module.exports =
 class CollectionBinding extends Binding

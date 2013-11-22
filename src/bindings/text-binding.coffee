@@ -1,4 +1,4 @@
-Binding = require './binding'
+Binding = require '../binding'
 
 module.exports =
 class TextBinding extends Binding

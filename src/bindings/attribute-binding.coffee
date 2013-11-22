@@ -1,4 +1,4 @@
-Binding = require './binding'
+Binding = require '../binding'
 
 module.exports =
 class AttributeBinding extends Binding
