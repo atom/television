@@ -7,11 +7,11 @@ class View
   ViewFactory.extend(this)
   Emitter.includeInto(this)
 
-  constructor: (@model, @element, @template, customProperties) ->
+  constructor: (@model, @element, @factory, customProperties) ->
     unless @element?
       if @constructor.canBuildViewForModel(model)
         @element = @constructor.buildElement(model)
-        @template = @constructor
+        @factory = @constructor
         @constructor.cacheView(this)
       else
         throw new Error("This view is not compatible with the given model")
@@ -29,12 +29,12 @@ class View
     for attribute in element.attributes
       if match = attribute.name.match(/^x-bind-(.*)/)
         bindingType = match[1]
-        binding = @template.bind(bindingType, element, @model, attribute.value)
+        binding = @factory.bind(bindingType, element, @model, attribute.value)
         @bindings.push([bindingType, binding])
         binding
 
   destroy: ->
     for [bindingType, binding] in @bindings
-      @template.unbind(bindingType, binding)
+      @factory.unbind(bindingType, binding)
     @destroyed?()
     @emit 'destroyed'
