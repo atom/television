@@ -13,7 +13,7 @@ class ViewFactory extends Mixin
   Subscriber.includeInto(this)
 
   constructor: (params={}) ->
-    {@name, @content, @parent} = params
+    {@name, @modelClassName, @content, @parent} = params
     @viewProperties = omit(params, 'name', 'content', 'parent')
     @registerDefaultBinders()
 
@@ -70,7 +70,10 @@ class ViewFactory extends Mixin
         @parent?.viewForModel(model)
 
   canBuildViewForModel: (model) ->
-    @name is "#{model.constructor.name}View"
+    if @modelClassName?
+      @modelClassName is model.constructor.name
+    else
+      @name is "#{model.constructor.name}View"
 
   cacheView: (view) ->
     {model} = view

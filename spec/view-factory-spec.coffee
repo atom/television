@@ -21,6 +21,10 @@ describe "ViewFactory", ->
       expect(factory.CommentView.viewForModel(new Blog).element.textContent).toBe "Blog"
       expect(factory.CommentView.viewForModel(new Post).element.textContent).toBe "Post"
 
+    it "matches against the 'modelClassName' property if one is present", ->
+      factory = new ViewFactory(name: "SomeKindaView", modelClassName: "Blog", content: "<div>Blog</div>")
+      expect(factory.viewForModel(new Blog).element.textContent).toBe "Blog"
+
   describe "element construction based on the 'content' property", ->
     blog = null
 
