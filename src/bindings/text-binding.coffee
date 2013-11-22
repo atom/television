@@ -4,6 +4,6 @@ module.exports =
 class TextBinding extends Binding
   @type: 'text'
 
-  constructor: ({@element, @model, @propertyName}) ->
-    @subscribe @model["$#{@propertyName}"], 'value', (value) =>
+  constructor: ({@element, @reader}) ->
+    @subscribe @reader, 'value', (value) =>
       @element.textContent = value

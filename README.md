@@ -331,8 +331,8 @@ class or view factory, including the global registry.
 
 ```coffee
 tv.registerBinder 'display',
-  bind: ({element, model, propertyName}) ->
-    model["$#{propertyName}"].onValue (value) ->
+  bind: ({element, reader}) ->
+    reader.onValue (value) ->
       if value
         element.style.display = 'block'
       else
@@ -349,11 +349,19 @@ expression that will be matched against the suffix of `x-bind-*` attributes.
 When an element with a matching attribute is found, your `bind` method will be
 called with an object containing the following properties:
 
-* `type` - The name of the binding, e.g. `"text"` or `"attribute-src"`
-* `factory` - The factory that built the view containing the bound element
-* `element` - The element being bound, that is the element with the matching `x-bind-*` attribute
-* `model` - The model being bound
-* `propertyName` - The property name on the model to bind
+* `type`
+  The suffix of the `x-bind-*` attribute; e.g. `"text"` or `"attribute-src"`.
+
+* `factory`
+  The factory that built the view containing the bound element.
+
+* `element`
+  The element being bound.
+
+* `reader`
+  A *behavior* that yields a value on subscription and whenever the bound property
+  changes on the model. Subscribe to its 'value' events and update the element
+  whenever your callback is triggered.
 
 Whatever you return from the `bind` method will be passed to `unbind` when the
 binding needs to be destroyed.

@@ -92,7 +92,8 @@ class ViewFactory extends Mixin
 
   createBinding: (type, element, model, propertyName) ->
     if binder = @getBinder(type)
-      binder.bind({factory: this, type, element, model, propertyName})
+      reader = model["$#{propertyName}"]
+      binder.bind({factory: this, type, element, reader})
 
   destroyBinding: (type, binding) ->
     if binder = @getBinder(type)
