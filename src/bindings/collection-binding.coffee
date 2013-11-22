@@ -3,7 +3,7 @@ Binding = require './binding'
 
 module.exports =
 class CollectionBinding extends Binding
-  constructor: (@template, @element, @model, @propertyName) ->
+  constructor: ({@factory, @element, @model, @propertyName}) ->
     if behavior = @model["$#{@propertyName}"]
       @subscribe behavior, 'value', @onCollectionAssigned
     else
@@ -22,6 +22,6 @@ class CollectionBinding extends Binding
   elementsForModels: (models) ->
     fragment = window.document.createDocumentFragment()
     for model in models
-      if {element} = @template.viewForModel(model)
+      if {element} = @factory.viewForModel(model)
         fragment.appendChild(element)
     fragment

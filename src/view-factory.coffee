@@ -75,9 +75,9 @@ class ViewFactory extends Mixin
     if views = @getViewCache().get(model)
       find views, (view) -> not view.element.parentNode?
 
-  bind: (type, element, model, propertyName) ->
-    if binder = @getBinder(type)
-      binder.bind(this, element, model, propertyName)
+  bind: (binderName, element, model, propertyName) ->
+    if binder = @getBinder(binderName)
+      binder.bind({factory: this, binderName, element, model, propertyName})
 
   unbind: (type, binding) ->
     if binder = @getBinder(type)
