@@ -40,6 +40,7 @@
     "jsdom": "~0.8.8",
     "underscore": "~1.5.2",
     "emissary": "0.20.0",
-    "mixto": "~0.3.0"
+    "mixto": "~0.3.0",
+    "underscore.string": "~2.3.3"
   }
 }

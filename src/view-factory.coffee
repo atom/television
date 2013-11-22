@@ -5,6 +5,7 @@ HTMLBuilder = require './html-builder'
 
 TextBinding = require('./bindings/text-binding')
 AttributeBinding = require('./bindings/attribute-binding')
+StyleBinding = require('./bindings/style-binding')
 ComponentBinding = require('./bindings/component-binding')
 CollectionBinding = require('./bindings/collection-binding')
 
@@ -23,6 +24,7 @@ class ViewFactory extends Mixin
   registerDefaultBinders: ->
     @registerBinder(TextBinding)
     @registerBinder(AttributeBinding)
+    @registerBinder(StyleBinding)
     @registerBinder(ComponentBinding)
     @registerBinder(CollectionBinding)
 
