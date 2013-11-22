@@ -3,6 +3,8 @@ Binding = require './binding'
 
 module.exports =
 class CollectionBinding extends Binding
+  @type: 'collection'
+
   constructor: ({@factory, @element, @model, @propertyName}) ->
     if behavior = @model["$#{@propertyName}"]
       @subscribe behavior, 'value', @onCollectionAssigned

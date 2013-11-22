@@ -2,6 +2,8 @@ Binding = require './binding'
 
 module.exports =
 class ComponentBinding extends Binding
+  @type: 'component'
+
   constructor: ({@factory, @element, @model, @propertyName}) ->
     @placeholderElement = @element
 

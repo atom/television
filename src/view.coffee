@@ -28,13 +28,13 @@ class View
 
     for attribute in element.attributes
       if match = attribute.name.match(/^x-bind-(.*)/)
-        bindingType = match[1]
-        binding = @factory.bind(bindingType, element, @model, attribute.value)
-        @bindings.push([bindingType, binding])
+        type = match[1]
+        binding = @factory.bind(type, element, @model, attribute.value)
+        @bindings.push([type, binding])
         binding
 
   destroy: ->
-    for [bindingType, binding] in @bindings
-      @factory.unbind(bindingType, binding)
+    for [type, binding] in @bindings
+      @factory.unbind(type, binding)
     @destroyed?()
     @emit 'destroyed'

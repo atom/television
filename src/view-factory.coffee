@@ -3,6 +3,10 @@ Mixin = require 'mixto'
 {Subscriber} = require 'emissary'
 HTMLBuilder = require './html-builder'
 
+TextBinding = require('./bindings/text-binding')
+ComponentBinding = require('./bindings/component-binding')
+CollectionBinding = require('./bindings/collection-binding')
+
 module.exports =
 class ViewFactory extends Mixin
   Subscriber.includeInto(this)
@@ -16,9 +20,9 @@ class ViewFactory extends Mixin
     @registerDefaultBinders()
 
   registerDefaultBinders: ->
-    @registerBinder('text', require('./bindings/text-binding'))
-    @registerBinder('component', require('./bindings/component-binding'))
-    @registerBinder('collection', require('./bindings/collection-binding'))
+    @registerBinder(TextBinding)
+    @registerBinder(ComponentBinding)
+    @registerBinder(CollectionBinding)
 
   getBinders: ->
     @binders ?= {}
@@ -39,8 +43,8 @@ class ViewFactory extends Mixin
       @getChildFactories().push(factory)
       @[factory.name] = factory
 
-  registerBinder: (type, binder) ->
-    @getBinders()[type] = binder
+  registerBinder: (binder) ->
+    @getBinders()[binder.type] = binder
 
   getBinder: (type) ->
     @getBinders()[type] ? @parent?.getBinder(type)
