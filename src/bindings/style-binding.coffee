@@ -2,7 +2,7 @@
 Binding = require '../binding'
 
 module.exports =
-class AttributeBinding extends Binding
+class StyleBinding extends Binding
   @type: /style-(.+)/
 
   constructor: ({type, @element, @reader}) ->
