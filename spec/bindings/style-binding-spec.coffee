@@ -9,18 +9,24 @@ describe "StyleBinding", ->
     tv = television()
 
   it "assigns the named style attribute to the value of the bound property", ->
-    Blog.properties 'width', 'backgroundColor'
+    Blog.properties 'width', 'height', 'backgroundColor'
     tv.register
       name: 'BlogView'
       content: ->
-        @div 'x-bind-style-width': "width", 'x-bind-style-background-color': "backgroundColor", style: "width: 50%"
+        @div {
+          'x-bind-style-width-in-percent': "width"
+          'x-bind-style-height': "height"
+          'x-bind-style-background-color': "backgroundColor"
+          style: "width: 50%"
+        }
 
-    blog = Blog.createAsRoot(width: "80%", backgroundColor: "red")
+    blog = Blog.createAsRoot(width: 80, height: 100, backgroundColor: "red")
     {element} = tv.viewForModel(blog)
     expect(element.style.width).toBe "80%"
+    expect(element.style.height).toBe 100
     expect(element.style.backgroundColor).toBe "red"
 
-    blog.width = "75%"
+    blog.width = 75
     blog.backgroundColor = "blue"
     expect(element.style.width).toBe "75%"
     expect(element.style.backgroundColor).toBe "blue"
