@@ -1,8 +1,5 @@
-{readFileSync} = require 'fs'
 {join} = require 'path'
-
-PEG = require 'pegjs'
-parser = PEG.buildParser(readFileSync(join(__dirname, '..', 'src', "expression-parser.pegjs"), 'utf8'))
+parser = require '../src/expression-parser'
 
 describe "ExpressionParser", ->
   it "parses single property names", ->
