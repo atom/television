@@ -27,7 +27,7 @@
     "url": "https://github.com/atom/television/issues"
   },
   "devDependencies": {
-    "telepath": "~0.41.0",
+    "telepath": "~0.46.0",
     "jasmine-focused": "~0.14.0",
     "grunt-contrib-coffee": "~0.7.0",
     "grunt-cli": "~0.1.8",
