@@ -1,7 +1,8 @@
 {find, clone, omit, extend} = require 'underscore'
 Mixin = require 'mixto'
-{Subscriber} = require 'emissary'
+{Subscriber, combine} = require 'emissary'
 HTMLBuilder = require './html-builder'
+TemplateParser = require './template-parser'
 ExpressionParser = require './expression-parser'
 
 TextBinding = require('./bindings/text-binding')
@@ -108,17 +109,30 @@ class ViewFactory extends Mixin
       find views, (view) -> not view.element.parentNode?
 
   createBinding: (id, element, model, expression) ->
-    {property, formatters} = ExpressionParser.parse(expression)
+
     if binder = @getBinder(id)
-      reader = model["$#{property}"]
-      for {id, args} in formatters
-        if formatter = @getFormatter(id)
-          reader = reader.map (value) -> formatter.read(value, args...)
+      reader = @createReader(model, expression)
       binder.bind({factory: this, id, element, reader})
 
   destroyBinding: (id, binding) ->
     if binder = @getBinder(id)
       binder.unbind(binding)
+
+  createTextTemplateBinding: (element, model) ->
+    segments = TemplateParser.parse(element.textContent).map (segment) =>
+      if typeof segment is 'string' then segment else @createReader(model, segment.expression)
+
+    reader = combine(segments).map (segments) -> segments.join('')
+
+    @getBinder('text').bind({factory: this, id: 'text', element, reader})
+
+  createReader: (model, expression) ->
+    {property, formatters} = ExpressionParser.parse(expression)
+    reader = model.behavior(property)
+    for {id, args} in formatters
+      if formatter = @getFormatter(id)
+        reader = reader.map (value) -> formatter.read(value, args...)
+    reader
 
   buildElement: (model) ->
     switch typeof @content
