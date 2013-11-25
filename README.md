@@ -343,13 +343,13 @@ tv.registerBinder 'display',
 ```
 
 
-Call `::registerBinder` with an object containing a `type` property and two
-methods, `bind` and `unbind`. The `type` property can be a string or a regular
+Call `::registerBinder` with an object containing an `id` property and two
+methods, `bind` and `unbind`. The `id` property can be a string or a regular
 expression that will be matched against the suffix of `x-bind-*` attributes.
 When an element with a matching attribute is found, your `bind` method will be
 called with an object containing the following properties:
 
-* `type`
+* `id`
   The suffix of the `x-bind-*` attribute; e.g. `"text"` or `"attribute-src"`.
 
 * `factory`
