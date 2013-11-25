@@ -1,6 +1,6 @@
 # Television
 
-Television is a reactive view framework based on the "model/view/view-model"
+Television is a reactive view framework based on the "model-driven views"
 paradigm. Views are simple, declarative wrappers around underlying model
 objects, enforcing a separation between application logic and display logic.
 Like most good ideas, this one isn't new, but Television provides a unique
