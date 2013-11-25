@@ -12,8 +12,8 @@ describe "ExpressionParser", ->
     expect(parser.parse("title | titleize | truncate")).toEqual {
       property: 'title'
       formatters: [
-        {name: 'titleize', arguments: []}
-        {name: 'truncate', arguments: []}
+        {id: 'titleize', args: []}
+        {id: 'truncate', args: []}
       ]
     }
 
@@ -21,7 +21,7 @@ describe "ExpressionParser", ->
     expect(parser.parse("""title | append ' Foo ' "Bar Baz" | replace foo bar 2""")).toEqual {
       property: 'title'
       formatters: [
-        {name: 'append', arguments: [" Foo ", "Bar Baz"]}
-        {name: 'replace', arguments: ["foo", "bar", 2]}
+        {id: 'append', args: [" Foo ", "Bar Baz"]}
+        {id: 'replace', args: ["foo", "bar", 2]}
       ]
     }

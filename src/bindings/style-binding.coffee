@@ -3,10 +3,10 @@ Binding = require '../binding'
 
 module.exports =
 class StyleBinding extends Binding
-  @type: /style-(.+)/
+  @id: /style-(.+)/
 
-  constructor: ({type, @element, @reader}) ->
-    @stylePropertyName = type.match(@constructor.type)[1]
+  constructor: ({id, @element, @reader}) ->
+    @stylePropertyName = id.match(@constructor.id)[1]
     if /-in-percent$/.test(@stylePropertyName)
       @inPercent = true
       @stylePropertyName = @stylePropertyName.replace(/-in-percent/, '')

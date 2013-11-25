@@ -2,12 +2,15 @@
 Mixin = require 'mixto'
 {Subscriber} = require 'emissary'
 HTMLBuilder = require './html-builder'
+ExpressionParser = require './expression-parser'
 
 TextBinding = require('./bindings/text-binding')
 AttributeBinding = require('./bindings/attribute-binding')
 StyleBinding = require('./bindings/style-binding')
 ComponentBinding = require('./bindings/component-binding')
 CollectionBinding = require('./bindings/collection-binding')
+
+AppendFormatter = require('./formatters/append-formatter')
 
 module.exports =
 class ViewFactory extends Mixin
@@ -17,9 +20,11 @@ class ViewFactory extends Mixin
     {@name, @modelClassName, @content, @parent} = params
     @viewProperties = omit(params, 'name', 'content', 'parent')
     @registerDefaultBinders()
+    @registerDefaultFormatters()
 
   extended: ->
     @registerDefaultBinders()
+    @registerDefaultFormatters()
 
   registerDefaultBinders: ->
     @registerBinder(TextBinding)
@@ -28,8 +33,14 @@ class ViewFactory extends Mixin
     @registerBinder(ComponentBinding)
     @registerBinder(CollectionBinding)
 
+  registerDefaultFormatters: ->
+    @registerFormatter(AppendFormatter)
+
   getBinders: ->
     @binders ?= []
+
+  getFormatters: ->
+    @formatters ?= {}
 
   getChildFactories: ->
     @childFactories ?= []
@@ -50,12 +61,18 @@ class ViewFactory extends Mixin
   registerBinder: (binder) ->
     @getBinders().push(binder)
 
-  getBinder: (type) ->
+  getBinder: (id) ->
     find @getBinders(), (binder) ->
-      if typeof binder.type is 'string'
-        binder.type is type
+      if typeof binder.id is 'string'
+        binder.id is id
       else
-        binder.type.test(type)
+        binder.id.test(id)
+
+  registerFormatter: (formatter) ->
+    @getFormatters()[formatter.id] = formatter
+
+  getFormatter: (id) ->
+    @getFormatters()[id] ? @parent?.getFormatter(id)
 
   viewForModel: (model) ->
     if view = @getCachedView(model)
@@ -90,13 +107,17 @@ class ViewFactory extends Mixin
     if views = @getViewCache().get(model)
       find views, (view) -> not view.element.parentNode?
 
-  createBinding: (type, element, model, propertyName) ->
-    if binder = @getBinder(type)
-      reader = model["$#{propertyName}"]
-      binder.bind({factory: this, type, element, reader})
+  createBinding: (id, element, model, expression) ->
+    {property, formatters} = ExpressionParser.parse(expression)
+    if binder = @getBinder(id)
+      reader = model["$#{property}"]
+      for {id, args} in formatters
+        if formatter = @getFormatter(id)
+          reader = reader.map (value) -> formatter.read(value, args...)
+      binder.bind({factory: this, id, element, reader})
 
-  destroyBinding: (type, binding) ->
-    if binder = @getBinder(type)
+  destroyBinding: (id, binding) ->
+    if binder = @getBinder(id)
       binder.unbind(binding)
 
   buildElement: (model) ->

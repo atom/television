@@ -9,8 +9,8 @@ start = _ property:identifier _ formatters:formatter* {
   return {property: property, formatters: formatters}
 }
 
-formatter = _ '|' _ name:identifier _ arguments:formatterArg* {
-  return {name: name, arguments: arguments}
+formatter = _ '|' _ id:identifier _ args:formatterArg* {
+  return {id: id, args: args}
 }
 
 formatterArg = _ !'|' arg:(string / number / bareword) _ { return arg }

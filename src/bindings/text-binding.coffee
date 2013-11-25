@@ -2,7 +2,7 @@ Binding = require '../binding'
 
 module.exports =
 class TextBinding extends Binding
-  @type: 'text'
+  @id: 'text'
 
   constructor: ({@element, @reader}) ->
     @subscribe @reader, 'value', (value) =>

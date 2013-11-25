@@ -3,7 +3,7 @@ Binding = require '../binding'
 
 module.exports =
 class CollectionBinding extends Binding
-  @type: 'collection'
+  @id: 'collection'
 
   constructor: ({@factory, @element, @reader}) ->
     @subscribe @reader, 'value', (collection) =>

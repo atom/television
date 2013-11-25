@@ -2,10 +2,10 @@ Binding = require '../binding'
 
 module.exports =
 class AttributeBinding extends Binding
-  @type: /attribute-(.+)/
+  @id: /attribute-(.+)/
 
-  constructor: ({type, @element, @reader}) ->
-    @attributeName = type.match(@constructor.type)[1]
+  constructor: ({id, @element, @reader}) ->
+    @attributeName = id.match(@constructor.id)[1]
     @placeholderValue = @element.getAttribute(@attributeName)
     @subscribe @reader, 'value', (value) =>
       if value ?= @placeholderValue
