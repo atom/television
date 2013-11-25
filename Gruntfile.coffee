@@ -2,6 +2,11 @@ module.exports = (grunt) ->
   grunt.initConfig
     pkg: grunt.file.readJSON('package.json')
 
+    peg:
+      expression:
+        src: "src/expression-parser.pegjs",
+        dest: "lib/expression-parser.js"
+
     coffee:
       glob_to_multiple:
         expand: true
@@ -31,8 +36,9 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks('grunt-contrib-coffee')
   grunt.loadNpmTasks('grunt-shell')
   grunt.loadNpmTasks('grunt-coffeelint')
+  grunt.loadNpmTasks('grunt-peg');
 
   grunt.registerTask 'clean', -> require('rimraf').sync('lib')
   grunt.registerTask('lint', ['coffeelint:src', 'coffeelint:test'])
-  grunt.registerTask('default', ['coffeelint', 'coffee'])
+  grunt.registerTask('default', ['peg', 'coffeelint', 'coffee'])
   grunt.registerTask('test', ['lint', 'shell:test'])
