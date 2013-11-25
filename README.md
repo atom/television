@@ -227,6 +227,21 @@ class BlogView extends View
 ```
 
 
+## Formatters
+
+Formatters transform the value of a property to prepare it for display. You
+apply a formatter with a `|` character following the bound property name.
+
+
+### Append Formatter
+
+The `append` formatter appends a specified string to the value of a property.
+
+```html
+<div x-bind-style-width="width | append %">...</div>
+```
+
+
 ## Custom View Methods
 
 You should concentrate the majority of your application logic in the model
@@ -365,3 +380,22 @@ called with an object containing the following properties:
 
 Whatever you return from the `bind` method will be passed to `unbind` when the
 binding needs to be destroyed.
+
+
+## Registering Custom Formatters
+
+Call `::registerFormatter` to register custom formatters for use with the `|`
+notation.
+
+```coffee
+tv.registerFormatter
+  id: 'prepend'
+  read: (value, prefix) ->
+    prefix.toString() + value.toString()
+```
+
+The `id` property specifies how users of your formatter will refer to it
+following `|` in expressions. Bidirectional bindings aren't working yet, so
+formatters only have a `read` method for now (eventually they'll have an
+optional `write` method). The `read` method will be called with a value to
+format followed by the arguments specified in the expression.
