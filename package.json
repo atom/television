@@ -34,7 +34,8 @@
     "grunt": "~0.4.1",
     "grunt-shell": "~0.2.2",
     "grunt-coffeelint": "0.0.6",
-    "rimraf": "~2.2.2"
+    "rimraf": "~2.2.2",
+    "pegjs": "~0.7.0"
   },
   "dependencies": {
     "jsdom": "~0.8.8",
