@@ -6,6 +6,8 @@ objects, enforcing a separation between application logic and display logic.
 Like most good ideas, this one isn't new, but Television provides a unique
 combination of features to make working in this style intuitive and productive.
 
+Massive props to the [Rivets.js](https://github.com/mikeric/rivets) framework,
+which inspired Television's approach to binding.
 
 ## View Classes
 
