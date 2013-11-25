@@ -118,13 +118,22 @@ class ViewFactory extends Mixin
     if binder = @getBinder(id)
       binder.unbind(binding)
 
-  createTextTemplateBinding: (element, model) ->
-    segments = TemplateParser.parse(element.textContent).map (segment) =>
-      if typeof segment is 'string' then segment else @createReader(model, segment.expression)
-
-    reader = combine(segments).map (segments) -> segments.join('')
-
+  createTemplateTextBinding: (element, model) ->
+    reader = @createReaderFromTemplate(element.textContent, model)
     @getBinder('text').bind({factory: this, id: 'text', element, reader})
+
+  createTemplateAttributeBinding: (element, attribute, model) ->
+    id = "attribute-#{attribute.name}"
+    reader = @createReaderFromTemplate(attribute.value, model)
+    @getBinder(id).bind({factory: this, id, element, reader})
+
+  createReaderFromTemplate: (template, model) ->
+    segments = TemplateParser.parse(template).map (segment) =>
+      if typeof segment is 'string'
+        segment
+      else
+        @createReader(model, segment.expression)
+    combine(segments).map (segments) -> segments.join('')
 
   createReader: (model, expression) ->
     {property, formatters} = ExpressionParser.parse(expression)

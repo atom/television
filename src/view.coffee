@@ -33,8 +33,11 @@ class View
         @bindings.push([type, binding])
         binding
 
+      if attribute.value.indexOf("{{") isnt -1
+        @bindings.push(@factory.createTemplateAttributeBinding(element, attribute, @model))
+
     if element.textContent.indexOf("{{") isnt -1
-      @bindings.push(@factory.createTextTemplateBinding(element, @model))
+      @bindings.push(@factory.createTemplateTextBinding(element, @model))
 
   destroy: ->
     for [type, binding] in @bindings
