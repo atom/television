@@ -1,9 +1,11 @@
 {find, clone, omit, extend} = require 'underscore'
 Mixin = require 'mixto'
 {Subscriber, combine} = require 'emissary'
+
 HTMLBuilder = require './html-builder'
-TemplateParser = require './template-parser'
-ExpressionParser = require './expression-parser'
+loadParser = require './load-parser'
+TemplateParser = loadParser(__dirname, 'template-parser')
+ExpressionParser = loadParser(__dirname, 'expression-parser')
 
 TextBinding = require('./bindings/text-binding')
 AttributeBinding = require('./bindings/attribute-binding')
