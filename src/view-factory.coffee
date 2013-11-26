@@ -1,6 +1,6 @@
 {find, clone, omit, extend} = require 'underscore'
 Mixin = require 'mixto'
-{Subscriber, combine} = require 'emissary'
+{Subscriber, Signal, combine} = require 'emissary'
 
 HTMLBuilder = require './html-builder'
 loadParser = require './load-parser'
@@ -12,6 +12,7 @@ AttributeBinding = require('./bindings/attribute-binding')
 StyleBinding = require('./bindings/style-binding')
 ComponentBinding = require('./bindings/component-binding')
 CollectionBinding = require('./bindings/collection-binding')
+FocusBinding = require('./bindings/focus-binding')
 
 AppendFormatter = require('./formatters/append-formatter')
 
@@ -35,6 +36,7 @@ class ViewFactory extends Mixin
     @registerBinder(StyleBinding)
     @registerBinder(ComponentBinding)
     @registerBinder(CollectionBinding)
+    @registerBinder(FocusBinding)
 
   registerDefaultFormatters: ->
     @registerFormatter(AppendFormatter)
@@ -111,10 +113,10 @@ class ViewFactory extends Mixin
       find views, (view) -> not view.element.parentNode?
 
   createBinding: (id, element, model, expression) ->
-
     if binder = @getBinder(id)
       reader = @createReader(model, expression)
-      binder.bind({factory: this, id, element, reader})
+      writer = @createWriter(model, expression)
+      binder.bind({factory: this, id, element, reader, writer})
 
   destroyBinding: (id, binding) ->
     if binder = @getBinder(id)
@@ -144,6 +146,11 @@ class ViewFactory extends Mixin
       if formatter = @getFormatter(id)
         reader = reader.map (value) -> formatter.read(value, args...)
     reader
+
+  createWriter: (model, property) ->
+    writer = new Signal
+    writer.onValue (value) -> model.set(property, value)
+    writer
 
   buildElement: (model) ->
     switch typeof @content
