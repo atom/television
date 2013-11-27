@@ -6,6 +6,9 @@ module.exports = (grunt) ->
       expression:
         src: "src/expression-parser.pegjs",
         dest: "lib/expression-parser.js"
+      template:
+        src: "src/template-parser.pegjs",
+        dest: "lib/template-parser.js"
 
     coffee:
       glob_to_multiple:
