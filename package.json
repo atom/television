@@ -4,7 +4,8 @@
   "description": "A minimalist framework for binding reactive views to observable models",
   "main": "lib/television",
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt test",
+    "prepublish": "grunt clean lint coffee peg"
   },
   "repository": {
     "type": "git",
