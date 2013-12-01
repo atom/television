@@ -17,28 +17,54 @@ class View
       else
         throw new Error("This view is not compatible with the given model")
 
+    @childViews = []
     extend(this, customProperties) if customProperties?
     @bindings = []
     @createBindings(@element)
     @model.on 'detached', => @destroy()
     @created?()
 
-  createBindings: (element) ->
+  addChildViews: (views) ->
+    @addChildView(view) for view in views
+
+  addChildView: (view) ->
+    @childViews.push(view)
+
+  removeChildViews: (views) ->
+    @removeChildView(view) for view in views
+
+  removeChildView: (view) ->
+    index = @childViews.indexOf(view)
+    @childViews.splice(index, 1)
+
+  viewForModel: (model) ->
+    @viewsForModel(model)[0]
+
+  viewsForModel: (model) ->
+    views = []
+    views.push(this) if @model is model
+    for childView in @childViews
+      views.push(childView.viewsForModel(model)...)
+    views
+
+  createBindings: (element=@element) ->
+    @bindings ?= []
+
     for child in element.children
       @createBindings(child)
 
     for attribute in element.attributes
       if match = attribute.name.match(/^x-bind-(.*)/)
         type = match[1]
-        binding = @factory.createBinding(type, element, @model, attribute.value)
+        binding = @factory.createBinding(type, this, element, @model, attribute.value)
         @bindings.push([type, binding])
         binding
 
       if attribute.value.indexOf("{{") isnt -1
-        @bindings.push(@factory.createTemplateAttributeBinding(element, attribute, @model))
+        @bindings.push(@factory.createTemplateAttributeBinding(this, element, attribute, @model))
 
     if element.textContent.indexOf("{{") isnt -1
-      @bindings.push(@factory.createTemplateTextBinding(element, @model))
+      @bindings.push(@factory.createTemplateTextBinding(this, element, @model))
 
   destroy: ->
     for [type, binding] in @bindings

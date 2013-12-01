@@ -112,24 +112,24 @@ class ViewFactory extends Mixin
     if views = @getViewCache().get(model)
       find views, (view) -> not view.element.parentNode?
 
-  createBinding: (id, element, model, expression) ->
+  createBinding: (id, view, element, model, expression) ->
     if binder = @getBinder(id)
       reader = @createReader(model, expression)
       writer = @createWriter(model, expression)
-      binder.bind({factory: this, id, element, reader, writer})
+      binder.bind({factory: this, id, view, element, reader, writer})
 
   destroyBinding: (id, binding) ->
     if binder = @getBinder(id)
       binder.unbind(binding)
 
-  createTemplateTextBinding: (element, model) ->
+  createTemplateTextBinding: (view, element, model) ->
     reader = @createReaderFromTemplate(element.textContent, model)
-    @getBinder('text').bind({factory: this, id: 'text', element, reader})
+    @getBinder('text').bind({factory: this, id: 'text', view, element, reader})
 
-  createTemplateAttributeBinding: (element, attribute, model) ->
+  createTemplateAttributeBinding: (view, element, attribute, model) ->
     id = "attribute-#{attribute.name}"
     reader = @createReaderFromTemplate(attribute.value, model)
-    @getBinder(id).bind({factory: this, id, element, reader})
+    @getBinder(id).bind({factory: this, id, view, element, reader})
 
   createReaderFromTemplate: (template, model) ->
     segments = TemplateParser.parse(template).map (segment) =>

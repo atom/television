@@ -5,20 +5,35 @@ module.exports =
 class CollectionBinding extends Binding
   @id: 'collection'
 
-  constructor: ({@factory, @element, @reader}) ->
+  constructor: ({@factory, @view, @element, @reader}) ->
+    @componentViews = []
+
     @subscribe @reader, 'value', (collection) =>
-      @unsubscribe(@collection) if @collection?
+      if @collection?
+        @unsubscribe(@collection)
+        @removeComponentViews(0, @componentViews.length)
+
       @collection = collection
-
       @element.innerHTML = ''
-      @element.appendChild(@elementsForModels(@collection.getValues()))
-      @subscribe @collection, 'changed', ({index, removedValues, insertedValues}) =>
-        times removedValues.length, => @element.removeChild(@element.children[index])
-        @element.insertBefore(@elementsForModels(insertedValues), @element.children[index])
 
-  elementsForModels: (models) ->
+      @insertComponentViews(0, @viewsForModels(@collection.getValues()))
+
+      @subscribe @collection, 'changed', ({index, removedValues, insertedValues}) =>
+        @removeComponentViews(index, removedValues.length)
+        @insertComponentViews(index, @viewsForModels(insertedValues))
+
+  insertComponentViews: (index, componentViews) ->
+
+    @componentViews.splice(index, 0, componentViews...)
+    @view.addChildViews(componentViews)
     fragment = window.document.createDocumentFragment()
-    for model in models
-      if {element} = @factory.buildView(model)
-        fragment.appendChild(element)
-    fragment
+    fragment.appendChild(element) for {element} in componentViews
+    @element.insertBefore(fragment, @element.children[index])
+
+  removeComponentViews: (index, count) ->
+    removedViews = @componentViews.splice(index, count)
+    @view.removeChildViews(removedViews)
+    @element.removeChild(element) for {element} in removedViews
+
+  viewsForModels: (models) ->
+    models.map (model) => @factory.buildView(model)

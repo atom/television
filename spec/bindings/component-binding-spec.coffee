@@ -36,15 +36,25 @@ describe "ComponentBinding", ->
     comment = new Comment(body: "Hello")
     blog = Blog.createAsRoot(featuredItem: post, items: [post, comment])
 
-    {element} = tv.buildView(blog)
+    view = tv.buildView(blog)
+    {element} = view
     expect(element.outerHTML).toBe '<div><h1>Featured Item</h1><div id="post" x-bind-text="title">Alpha</div></div>'
+    expect(view.viewsForModel(post).length).toBe 1
+    expect(view.viewForModel(post).model).toBe post
 
     blog.featuredItem = comment
     expect(element.outerHTML).toBe '<div><h1>Featured Item</h1><div id="comment" x-bind-text="body">Hello</div></div>'
+    expect(view.viewsForModel(post).length).toBe 0
+    expect(view.viewsForModel(comment).length).toBe 1
+    expect(view.viewForModel(comment).model).toBe comment
 
     blog.featuredItem = null
     expect(element.outerHTML).toBe '<div><h1>Featured Item</h1><div x-bind-component="featuredItem">Placeholder</div></div>'
+    expect(view.viewsForModel(post).length).toBe 0
+    expect(view.viewsForModel(comment).length).toBe 0
 
     post.title = "Beta"
     blog.featuredItem = post
     expect(element.outerHTML).toBe '<div><h1>Featured Item</h1><div id="post" x-bind-text="title">Beta</div></div>'
+    expect(view.viewsForModel(post).length).toBe 1
+    expect(view.viewForModel(post).model).toBe post

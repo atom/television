@@ -4,13 +4,19 @@ module.exports =
 class ComponentBinding extends Binding
   @id: 'component'
 
-  constructor: ({@factory, @element, @reader}) ->
+  constructor: ({@factory, @view, @element, @reader}) ->
     @placeholderElement = @element
 
     @subscribe @reader, 'value', (model) =>
-      if model? and view = @factory.buildView(model)
-        @element.parentNode.replaceChild(view.element, @element)
-        @element = view.element
+      if @componentView?
+        @view.removeChildView(@componentView)
+        @componentView = null
+
+      if model? and componentView = @factory.buildView(model)
+        @element.parentNode.replaceChild(componentView.element, @element)
+        @element = componentView.element
+        @view.addChildView(componentView)
+        @componentView = componentView
       else
         @element.parentNode.replaceChild(@placeholderElement, @element)
         @element = @placeholderElement
