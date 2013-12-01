@@ -1,11 +1,12 @@
 {toArray, extend} = require 'underscore'
-{Emitter} = require 'emissary'
+{Emitter, Subscriber} = require 'emissary'
 ViewFactory = require './view-factory'
 
 module.exports =
 class View
   ViewFactory.extend(this)
   Emitter.includeInto(this)
+  Subscriber.includeInto(this)
 
   constructor: (@model, @element, @factory, customProperties) ->
     unless @element?
