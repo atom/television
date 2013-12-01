@@ -14,7 +14,7 @@ describe "StyleBinding", ->
       name: 'BlogView'
       content: ->
         @div {
-          'x-bind-style-width-in-percent': "width"
+          'x-bind-style-width': "width | append %"
           'x-bind-style-height': "height"
           'x-bind-style-background-color': "backgroundColor"
           style: "width: 50%"
@@ -23,7 +23,7 @@ describe "StyleBinding", ->
     blog = Blog.createAsRoot(width: 80, height: 100, backgroundColor: "red")
     {element} = tv.viewForModel(blog)
     expect(element.style.width).toBe "80%"
-    expect(element.style.height).toBe 100
+    expect(element.style.height).toBe "100px"
     expect(element.style.backgroundColor).toBe "red"
 
     blog.width = 75

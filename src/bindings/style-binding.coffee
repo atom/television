@@ -6,18 +6,12 @@ class StyleBinding extends Binding
   @id: /style-(.+)/
 
   constructor: ({id, @element, @reader}) ->
-    @stylePropertyName = id.match(@constructor.id)[1]
-    if /-in-percent$/.test(@stylePropertyName)
-      @inPercent = true
-      @stylePropertyName = @stylePropertyName.replace(/-in-percent/, '')
-    else
-      @inPercent = false
-    @stylePropertyName = camelize(@stylePropertyName)
+    @stylePropertyName = camelize(id.match(@constructor.id)[1])
     @placeholderValue = @element.style[@stylePropertyName]
 
     @subscribe @reader, 'value', (value) =>
       if value?
-        value += '%' if @inPercent
+        value += 'px' if typeof value is 'number'
         @element.style[@stylePropertyName] = value
       else
         @element.style[@stylePropertyName] = @placeholderValue

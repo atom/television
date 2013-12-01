@@ -2,4 +2,5 @@ module.exports =
   id: 'append'
 
   read: (value, args...) ->
-    value.toString() + args.map((arg) -> arg.toString()).join('')
+    if value?
+      value.toString() + args.map((arg) -> arg.toString()).join('')
