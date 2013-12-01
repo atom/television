@@ -304,7 +304,7 @@ tv.register(BlogView)
 tv.register(PostView)
 tv.register(UserView)
 
-blogView = tv.viewForModel(blog)
+blogView = tv.buildView(blog)
 
 tv.register(SpecialUserView) # add a view for a new type
 blog.author = new SpecialUser # the new view will automatically be used by BlogView
@@ -332,12 +332,12 @@ tv.register
   destroyed: -> # ...
   customMethod: -> # ...
   
-view = tv.viewForModel(blog)
+view = tv.buildView(blog)
 view.customMethod()
 
 # or create a standalone factory
 factory = tv.buildViewFactory name: 'BlogView' content: # ...
-view = factory.viewForModel(blog)
+view = factory.buildView(blog)
 ```
 
 

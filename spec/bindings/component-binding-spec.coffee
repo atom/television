@@ -36,7 +36,7 @@ describe "ComponentBinding", ->
     comment = new Comment(body: "Hello")
     blog = Blog.createAsRoot(featuredItem: post, items: [post, comment])
 
-    {element} = tv.viewForModel(blog)
+    {element} = tv.buildView(blog)
     expect(element.outerHTML).toBe '<div><h1>Featured Item</h1><div id="post" x-bind-text="title">Alpha</div></div>'
 
     blog.featuredItem = comment

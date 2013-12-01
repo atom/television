@@ -23,7 +23,7 @@ describe "FocusBinding", ->
     child1 = new Child
     child2 = new Child
     parent = Parent.createAsRoot(children: [child1, child2])
-    {element} = tv.viewForModel(parent)
+    {element} = tv.buildView(parent)
 
   it "focuses/blurs the bound element when the property changes", ->
     expect(document.activeElement).not.toBe element.firstChild

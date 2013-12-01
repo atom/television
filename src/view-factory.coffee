@@ -79,7 +79,7 @@ class ViewFactory extends Mixin
   getFormatter: (id) ->
     @getFormatters()[id] ? @parent?.getFormatter(id)
 
-  viewForModel: (model) ->
+  buildView: (model) ->
     if view = @getCachedView(model)
       view
     else if @canBuildViewForModel(model)
@@ -89,9 +89,9 @@ class ViewFactory extends Mixin
         throw new Error("Template did not specify content")
     else
       if childFactory = find(@getChildFactories(), (f) -> f.canBuildViewForModel(model))
-        childFactory.viewForModel(model)
+        childFactory.buildView(model)
       else
-        @parent?.viewForModel(model)
+        @parent?.buildView(model)
 
   canBuildViewForModel: (model) ->
     if @modelClassName?

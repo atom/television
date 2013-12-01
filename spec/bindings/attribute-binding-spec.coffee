@@ -17,7 +17,7 @@ describe "AttributeBinding", ->
         content: -> @img 'x-bind-attribute-src': "avatarUrl", src: "placeholder.png"
 
       user = User.createAsRoot(avatarUrl: "/images/john.png")
-      {element} = tv.viewForModel(user)
+      {element} = tv.buildView(user)
       expect(element.outerHTML).toBe '<img x-bind-attribute-src="avatarUrl" src="/images/john.png" />'
       user.avatarUrl = "/images/jane.png"
       expect(element.outerHTML).toBe '<img x-bind-attribute-src="avatarUrl" src="/images/jane.png" />'
@@ -30,7 +30,7 @@ describe "AttributeBinding", ->
         content: -> @img 'x-bind-attribute-src': "avatarUrl"
 
       user = User.createAsRoot(avatarUrl: "/images/john.png")
-      {element} = tv.viewForModel(user)
+      {element} = tv.buildView(user)
       expect(element.outerHTML).toBe '<img x-bind-attribute-src="avatarUrl" src="/images/john.png" />'
       user.avatarUrl = null
       expect(element.outerHTML).toBe '<img x-bind-attribute-src="avatarUrl" />'
@@ -44,7 +44,7 @@ describe "AttributeBinding", ->
         content: -> @div class: "user {{gender}} {{mood}}"
 
       user = User.createAsRoot(gender: "male", mood: "excited")
-      {element} = tv.viewForModel(user)
+      {element} = tv.buildView(user)
       expect(element.outerHTML).toBe '<div class="user male excited"></div>'
 
       user.gender = "female"

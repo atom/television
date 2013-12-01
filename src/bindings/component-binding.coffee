@@ -8,7 +8,7 @@ class ComponentBinding extends Binding
     @placeholderElement = @element
 
     @subscribe @reader, 'value', (model) =>
-      if model? and view = @factory.viewForModel(model)
+      if model? and view = @factory.buildView(model)
         @element.parentNode.replaceChild(view.element, @element)
         @element = view.element
       else

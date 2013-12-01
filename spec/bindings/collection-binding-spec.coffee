@@ -30,7 +30,7 @@ describe "CollectionBinding", ->
     post3 = new Post(title: "Charlie")
     blog = Blog.createAsRoot(posts: [post1, post2, post3])
 
-    {element} = tv.viewForModel(blog)
+    {element} = tv.buildView(blog)
     expect(element.outerHTML).toBe tv.buildHTML ->
       @div =>
         @h1 "My Posts:"

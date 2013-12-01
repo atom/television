@@ -19,6 +19,6 @@ class CollectionBinding extends Binding
   elementsForModels: (models) ->
     fragment = window.document.createDocumentFragment()
     for model in models
-      if {element} = @factory.viewForModel(model)
+      if {element} = @factory.buildView(model)
         fragment.appendChild(element)
     fragment

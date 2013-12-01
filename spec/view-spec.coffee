@@ -18,7 +18,7 @@ describe "View", ->
         view = new BlogView(new Blog)
         expect(view.element.outerHTML).toBe "<div>Blog</div>"
 
-    describe "via ::viewForModel", ->
+    describe "via ::buildView", ->
       it "builds an instance of the receiving view if it matches the model, but otherwise delegates to a matching immediate child or its parent", ->
         class PostView extends View
           @content: -> @div "Post"
@@ -30,7 +30,7 @@ describe "View", ->
           @register PostView, CommentView
           @content: -> @div "Blog"
 
-        expect(BlogView.viewForModel(new Blog).element.textContent).toBe "Blog"
-        expect(BlogView.viewForModel(new Post).element.textContent).toBe "Post"
-        expect(BlogView.CommentView.viewForModel(new Blog).element.textContent).toBe "Blog"
-        expect(BlogView.CommentView.viewForModel(new Post).element.textContent).toBe "Post"
+        expect(BlogView.buildView(new Blog).element.textContent).toBe "Blog"
+        expect(BlogView.buildView(new Post).element.textContent).toBe "Post"
+        expect(BlogView.CommentView.buildView(new Blog).element.textContent).toBe "Blog"
+        expect(BlogView.CommentView.buildView(new Post).element.textContent).toBe "Post"

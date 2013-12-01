@@ -17,7 +17,7 @@ describe "TextBinding", ->
           @div => @h1 'x-bind-text': "title"
 
       blog = Blog.createAsRoot(title: "Alpha")
-      {element} = tv.viewForModel(blog)
+      {element} = tv.buildView(blog)
       expect(element.outerHTML).toBe '<div><h1 x-bind-text="title">Alpha</h1></div>'
       blog.title = "Beta"
       expect(element.outerHTML).toBe '<div><h1 x-bind-text="title">Beta</h1></div>'
@@ -31,7 +31,7 @@ describe "TextBinding", ->
           @div => @h1 "{{title}} – {{subtitle}}!"
 
       blog = Blog.createAsRoot(title: "Alpha", subtitle: "Comes before Beta")
-      {element} = tv.viewForModel(blog)
+      {element} = tv.buildView(blog)
       expect(element.outerHTML).toBe '<div><h1>Alpha – Comes before Beta!</h1></div>'
 
       blog.title = "Beta"

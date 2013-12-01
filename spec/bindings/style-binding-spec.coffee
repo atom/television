@@ -21,7 +21,7 @@ describe "StyleBinding", ->
         }
 
     blog = Blog.createAsRoot(width: 80, height: 100, backgroundColor: "red")
-    {element} = tv.viewForModel(blog)
+    {element} = tv.buildView(blog)
     expect(element.style.width).toBe "80%"
     expect(element.style.height).toBe "100px"
     expect(element.style.backgroundColor).toBe "red"
