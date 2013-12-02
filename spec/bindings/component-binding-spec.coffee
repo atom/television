@@ -4,6 +4,8 @@ television = require '../../src/television'
 describe "ComponentBinding", ->
   [tv, Blog, Post, Comment] = []
 
+  getModel = (view) -> view.model
+
   beforeEach ->
     class Blog extends Model
     class Post extends Model
@@ -39,22 +41,19 @@ describe "ComponentBinding", ->
     view = tv.buildView(blog)
     {element} = view
     expect(element.outerHTML).toBe '<div><h1>Featured Item</h1><div id="post" x-bind-text="title">Alpha</div></div>'
-    expect(view.viewsForModel(post).length).toBe 1
-    expect(view.viewForModel(post).model).toBe post
+    expect(view.viewsForModel(post).map(getModel)).toEqual [post]
 
     blog.featuredItem = comment
     expect(element.outerHTML).toBe '<div><h1>Featured Item</h1><div id="comment" x-bind-text="body">Hello</div></div>'
-    expect(view.viewsForModel(post).length).toBe 0
-    expect(view.viewsForModel(comment).length).toBe 1
-    expect(view.viewForModel(comment).model).toBe comment
+    expect(view.viewsForModel(post)).toEqual []
+    expect(view.viewsForModel(comment).map(getModel)).toEqual [comment]
 
     blog.featuredItem = null
     expect(element.outerHTML).toBe '<div><h1>Featured Item</h1><div x-bind-component="featuredItem">Placeholder</div></div>'
-    expect(view.viewsForModel(post).length).toBe 0
-    expect(view.viewsForModel(comment).length).toBe 0
+    expect(view.viewsForModel(post)).toEqual []
+    expect(view.viewsForModel(comment)).toEqual []
 
     post.title = "Beta"
     blog.featuredItem = post
     expect(element.outerHTML).toBe '<div><h1>Featured Item</h1><div id="post" x-bind-text="title">Beta</div></div>'
-    expect(view.viewsForModel(post).length).toBe 1
-    expect(view.viewForModel(post).model).toBe post
+    expect(view.viewsForModel(post).map(getModel)).toEqual [post]
