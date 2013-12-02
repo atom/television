@@ -2,20 +2,25 @@
 television = require '../../src/television'
 
 describe "ComponentBinding", ->
-  [tv, Blog, Post, Comment] = []
+  [tv, Blog, Post, Comment, blog, post, comment] = []
 
   getModel = (view) -> view.model
 
   beforeEach ->
     class Blog extends Model
-    class Post extends Model
-    class Comment extends Model
-    tv = television()
+      @properties 'featuredItem', 'items'
 
-  it "replaces the bound element with a view based on the value of the bound property", ->
-    Blog.properties 'featuredItem', 'items'
-    Post.property 'title'
-    Comment.property 'body'
+    class Post extends Model
+      @property 'title'
+
+    class Comment extends Model
+      @property 'body'
+
+    post = new Post(title: "Alpha")
+    comment = new Comment(body: "Hello")
+    blog = Blog.createAsRoot(featuredItem: post, items: [post, comment])
+
+    tv = television()
 
     tv.register
       name: 'BlogView'
@@ -23,21 +28,24 @@ describe "ComponentBinding", ->
         @div =>
           @h1 "Featured Item"
           @div 'x-bind-component': "featuredItem", "Placeholder"
+      attached: -> @attachedCalled = true
+      detached: -> @detachedCalled = true
 
     tv.register
       name: 'PostView'
       content: ->
         @div id: 'post', 'x-bind-text': 'title'
+      attached: -> @attachedCalled = true
+      detached: -> @detachedCalled = true
 
     tv.register
       name: 'CommentView'
       content: ->
         @div id: 'comment', 'x-bind-text': 'body'
+      attached: -> @attachedCalled = true
+      detached: -> @detachedCalled = true
 
-    post = new Post(title: "Alpha")
-    comment = new Comment(body: "Hello")
-    blog = Blog.createAsRoot(featuredItem: post, items: [post, comment])
-
+  it "replaces the bound element with a view based on the value of the bound property", ->
     view = tv.buildView(blog)
     {element} = view
     expect(element.outerHTML).toBe '<div><h1>Featured Item</h1><div id="post" x-bind-text="title">Alpha</div></div>'
@@ -57,3 +65,22 @@ describe "ComponentBinding", ->
     blog.featuredItem = post
     expect(element.outerHTML).toBe '<div><h1>Featured Item</h1><div id="post" x-bind-text="title">Beta</div></div>'
     expect(view.viewsForModel(post).map(getModel)).toEqual [post]
+
+  it "calls attached/detached hooks on the component views", ->
+    view = tv.buildView(blog)
+    document.body.appendChild(view.element)
+    view.attachedToDocument()
+    expect(view.attachedCalled).toBe true
+
+    postView = view.viewForModel(post)
+    expect(postView.attachedCalled).toBe true
+    expect(postView.detachedCalled).toBeUndefined()
+
+    blog.featuredItem = comment
+    expect(postView.detachedCalled).toBe true
+    commentView = view.viewForModel(comment)
+    expect(commentView.attachedCalled).toBe true
+    expect(commentView.detachedCalled).toBeUndefined()
+
+    blog.featuredItem = null
+    expect(commentView.detachedCalled).toBe true

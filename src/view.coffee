@@ -28,18 +28,36 @@ class View extends Mixin
     extend(this, customProperties) if customProperties?
     @created?()
 
-  addChildViews: (views) ->
-    @addChildView(view) for view in views
+  isAttachedToDocument: ->
+    element = @element
+    while element = element.parentNode
+      return true if element is document.body
+    false
 
-  addChildView: (view) ->
+  attachedToDocument: ->
+    throw new Error("Not attached to the document") unless @isAttachedToDocument()
+    childView.attachedToDocument() for childView in @childViews.slice()
+    @attached?()
+
+  detachedFromDocument: ->
+    throw new Error("Still attached to the document") if @isAttachedToDocument()
+    childView.detachedFromDocument() for childView in @childViews.slice()
+    @detached?()
+
+  childViewsAttached: (views) ->
+    @childViewAttached(view, @isAttachedToDocument()) for view in views
+
+  childViewAttached: (view, isAttached=@isAttachedToDocument()) ->
     @childViews.push(view)
+    view.attachedToDocument() if isAttached
 
-  removeChildViews: (views) ->
-    @removeChildView(view) for view in views
+  childViewsDetached: (views) ->
+    @childViewDetached(view, @isAttachedToDocument()) for view in views
 
-  removeChildView: (view) ->
+  childViewDetached: (view, isAttached=@isAttachedToDocument()) ->
     index = @childViews.indexOf(view)
     @childViews.splice(index, 1)
+    view.detachedFromDocument() if isAttached
 
   viewForModel: (model) ->
     @viewsForModel(model)[0]

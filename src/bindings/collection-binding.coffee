@@ -23,17 +23,16 @@ class CollectionBinding extends Binding
         @insertComponentViews(index, @viewsForModels(insertedValues))
 
   insertComponentViews: (index, componentViews) ->
-
     @componentViews.splice(index, 0, componentViews...)
-    @view.addChildViews(componentViews)
     fragment = window.document.createDocumentFragment()
     fragment.appendChild(element) for {element} in componentViews
     @element.insertBefore(fragment, @element.children[index])
+    @view.childViewsAttached(componentViews)
 
   removeComponentViews: (index, count) ->
     removedViews = @componentViews.splice(index, count)
-    @view.removeChildViews(removedViews)
     @element.removeChild(element) for {element} in removedViews
+    @view.childViewsDetached(removedViews)
 
   viewsForModels: (models) ->
     models.map (model) => @factory.buildView(model)

@@ -2,19 +2,23 @@
 television = require '../../src/television'
 
 describe "CollectionBinding", ->
-  [tv, Blog, Post, Comment] = []
-
-  beforeEach ->
-    class Blog extends Model
-    class Post extends Model
-    class Comment extends Model
-    tv = television()
+  [tv, Blog, Post, blog, post1, post2, post3] = []
 
   getModel = (view) -> view.model
 
-  it "populates the bound element with child views based on the contents of the bound collection", ->
-    Blog.property 'posts'
-    Post.property 'title'
+  beforeEach ->
+    class Blog extends Model
+      @property 'posts'
+
+    class Post extends Model
+      @property 'title'
+
+    post1 = new Post(title: "Alpha")
+    post2 = new Post(title: "Bravo")
+    post3 = new Post(title: "Charlie")
+    blog = Blog.createAsRoot(posts: [post1, post2, post3])
+
+    tv = television()
 
     tv.register
       name: 'BlogView'
@@ -22,16 +26,15 @@ describe "CollectionBinding", ->
         @div =>
           @h1 "My Posts:"
           @ol 'x-bind-collection': "posts"
+
     tv.BlogView.register
       name: 'PostView',
       content: ->
         @li 'x-bind-text': "title"
+      attached: -> @attachedCalled = true
+      detached: -> @detachedCalled = true
 
-    post1 = new Post(title: "Alpha")
-    post2 = new Post(title: "Bravo")
-    post3 = new Post(title: "Charlie")
-    blog = Blog.createAsRoot(posts: [post1, post2, post3])
-
+  it "populates the bound element with child views based on the contents of the bound collection", ->
     view = tv.buildView(blog)
     {element} = view
     expect(element.outerHTML).toBe tv.buildHTML ->
@@ -80,3 +83,35 @@ describe "CollectionBinding", ->
     expect(view.viewsForModel(post5)).toEqual []
     expect(view.viewsForModel(post6).map(getModel)).toEqual [post6]
     expect(view.viewsForModel(post7).map(getModel)).toEqual [post7]
+
+  it "calls attached/detached hooks on the child views", ->
+    view = tv.buildView(blog)
+    {element} = view
+    document.body.appendChild(element)
+    view.attachedToDocument()
+
+    postView1 = view.viewForModel(post1)
+    postView2 = view.viewForModel(post2)
+    postView3 = view.viewForModel(post3)
+    expect(postView1.attachedCalled).toBe true
+    expect(postView2.attachedCalled).toBe true
+    expect(postView3.attachedCalled).toBe true
+
+    post4 = new Post(title: "Delta")
+    post5 = new Post(title: "Echo")
+    blog.posts.splice(1, 1, post4, post5)
+    expect(postView2.detachedCalled).toBe true
+    postView4 = view.viewForModel(post4)
+    postView5 = view.viewForModel(post5)
+    expect(postView4.attachedCalled).toBe true
+    expect(postView5.attachedCalled).toBe true
+
+    post6 = new Post(title: "Foxtrot")
+    post7 = new Post(title: "Golf")
+    blog.posts = [post6, post7]
+    expect(postView1.detachedCalled).toBe true
+    expect(postView3.detachedCalled).toBe true
+    postView6 = view.viewForModel(post6)
+    postView7 = view.viewForModel(post7)
+    expect(postView6.attachedCalled).toBe true
+    expect(postView7.attachedCalled).toBe true
