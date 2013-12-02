@@ -21,10 +21,10 @@ class View
         throw new Error("This view is not compatible with the given model")
 
     @childViews = []
-    extend(this, customProperties) if customProperties?
     @bindings = []
     @createBindings(@element)
     @model.on 'detached', => @destroy()
+    extend(this, customProperties) if customProperties?
     @created?()
 
   addChildViews: (views) ->
