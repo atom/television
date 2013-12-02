@@ -8,6 +8,9 @@ class View
   Emitter.includeInto(this)
   Subscriber.includeInto(this)
 
+  @buildViewInstance: ({model, element, factory, viewProperties}) ->
+    new this(model, element, this, @viewProperties)
+
   constructor: (@model, @element, @factory, customProperties) ->
     unless @element?
       if @constructor.canBuildViewForModel(model)

@@ -30,7 +30,18 @@ describe "View", ->
           @register PostView, CommentView
           @content: -> @div "Blog"
 
-        expect(BlogView.buildView(new Blog).element.textContent).toBe "Blog"
-        expect(BlogView.buildView(new Post).element.textContent).toBe "Post"
-        expect(BlogView.CommentView.buildView(new Blog).element.textContent).toBe "Blog"
-        expect(BlogView.CommentView.buildView(new Post).element.textContent).toBe "Post"
+        blogView1 = BlogView.buildView(new Blog)
+        expect(blogView1 instanceof BlogView).toBe true
+        expect(blogView1.element.textContent).toBe "Blog"
+
+        postView1 = BlogView.buildView(new Post)
+        expect(postView1 instanceof PostView).toBe true
+        expect(postView1.element.textContent).toBe "Post"
+
+        blogView2 = BlogView.CommentView.buildView(new Blog)
+        expect(blogView2 instanceof BlogView).toBe true
+        expect(blogView2.element.textContent).toBe "Blog"
+
+        postView2 = BlogView.CommentView.buildView(new Post)
+        expect(postView2 instanceof PostView).toBe true
+        expect(postView2.element.textContent).toBe "Post"
