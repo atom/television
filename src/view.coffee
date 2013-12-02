@@ -37,11 +37,13 @@ class View extends Mixin
   attachedToDocument: ->
     throw new Error("Not attached to the document") unless @isAttachedToDocument()
     childView.attachedToDocument() for childView in @childViews.slice()
+    @_attached?()
     @attached?()
 
   detachedFromDocument: ->
     throw new Error("Still attached to the document") if @isAttachedToDocument()
     childView.detachedFromDocument() for childView in @childViews.slice()
+    @_detached?()
     @detached?()
 
   childViewsAttached: (views) ->
