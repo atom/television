@@ -58,3 +58,12 @@ describe "FocusBinding", ->
     element.firstChild.focus()
     expect(child1.focused).toBe true
     expect(child2.focused).toBe false
+
+  it "does not permit feedback loops in focus assignment", ->
+    values = []
+    child1.$focused.onValue (focused) ->
+      values.push(focused)
+      child2.focused = true if focused
+
+    element.firstChild.focus()
+    expect(values).toEqual [false, true, false]

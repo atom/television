@@ -7,18 +7,33 @@ class FocusBinding extends Binding
 
   @writable: true
 
+  handlingFocus: false
+  handlingBlur: false
+
   constructor: ({@element, @reader, @writer}) ->
     @subscribe @reader, 'value', (value) =>
       if value
-        @element.focus()
+        unless @handlingFocus
+          @handlingFocus = true
+          @element.focus()
+          @handlingFocus = false
       else
-        @element.blur()
+        unless @handlingBlur
+          @handlingBlur = true
+          @element.blur()
+          @handlingBlur = false
 
     @element.addEventListener('focus', @onElementFocused)
     @element.addEventListener('blur', @onElementBlurred)
 
   onElementFocused: =>
-    @writer.emit 'value', true
+    unless @handlingFocus
+      @handlingFocus = true
+      @writer.emit 'value', true
+      @handlingFocus = false
 
   onElementBlurred: =>
-    @writer.emit 'value', false
+    unless @handlingBlur
+      @handlingBlur = true
+      @writer.emit 'value', false
+      @handlingBlur = false
