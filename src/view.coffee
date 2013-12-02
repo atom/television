@@ -1,9 +1,10 @@
 {toArray, extend} = require 'underscore'
 {Emitter, Subscriber} = require 'emissary'
 ViewFactory = require './view-factory'
+Mixin = require 'mixto'
 
 module.exports =
-class View
+class View extends Mixin
   ViewFactory.extend(this)
   Emitter.includeInto(this)
   Subscriber.includeInto(this)
