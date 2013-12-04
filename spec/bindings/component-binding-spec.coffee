@@ -84,3 +84,25 @@ describe "ComponentBinding", ->
 
     blog.featuredItem = null
     expect(commentView.detachedCalled).toBe true
+
+  it "recycles an existing view if it's being replaced by a view containing itself", ->
+    class TestModel extends Model
+      @property 'child'
+
+    tv.register
+      name: 'TestModelView'
+      content: ->
+        @div =>
+          @div 'x-bind-component': "child"
+
+    model2 = new TestModel
+    model1 = TestModel.createAsRoot(child: model2)
+
+    model1View = tv.buildView(model1)
+    model2View = model1View.viewForModel(model2)
+    model2Element = model1View.element.firstChild
+
+    model1.child = new TestModel(child: model2)
+
+    expect(model1View.viewForModel(model2) is model2View).toBe true
+    expect(model1View.element.firstChild.firstChild).toBe model2Element

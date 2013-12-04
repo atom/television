@@ -6,15 +6,22 @@ class ComponentBinding extends Binding
 
   constructor: ({@factory, @view, @element, @reader}) ->
     @placeholderElement = @element
+    @componentView = null
 
     @subscribe @reader, 'value', (model) =>
+      parentNode = @element.parentNode
+      nextSibling = @element.nextSibling
+      parentNode.removeChild(@element)
+      @element = null
+      if @componentView?
+        @view.childViewDetached(@componentView)
+        @componentView = null
+
       if model? and componentView = @factory.buildView(model)
-        @element.parentNode.replaceChild(componentView.element, @element)
-        @element = componentView.element
-        @view.childViewDetached(@componentView) if @componentView?
-        @view.childViewAttached(componentView)
         @componentView = componentView
+        @element = @componentView.element
+        parentNode.insertBefore(@element, nextSibling)
+        @view.childViewAttached(@componentView)
       else
-        @element.parentNode.replaceChild(@placeholderElement, @element)
         @element = @placeholderElement
-        @view.childViewDetached(@componentView) if @componentView?
+        parentNode.insertBefore(@element, nextSibling)
