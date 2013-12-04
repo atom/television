@@ -9,13 +9,14 @@ class View extends Mixin
   Emitter.includeInto(this)
   Subscriber.includeInto(this)
 
-  @buildViewInstance: ({model, element, factory, viewProperties}) ->
-    new this(model, element, this, @viewProperties)
+  @buildViewInstance: (model) ->
+    if element = @buildElement(model)
+      new this(model, element, this, @viewProperties)
 
   constructor: (@model, @element, @factory, customProperties) ->
     unless @element?
-      if @constructor.canBuildViewForModel(model)
-        @element = @constructor.buildElement(model)
+      if @constructor.canBuildViewForModel(@model)
+        @element = @constructor.buildElement(@model)
         @factory = @constructor
         @constructor.cacheView(this)
       else
@@ -23,6 +24,7 @@ class View extends Mixin
 
     @childViews = []
     @bindings = []
+
     @createBindings(@element)
     @model.on 'detached', => @destroy()
     extend(this, customProperties) if customProperties?
@@ -74,10 +76,10 @@ class View extends Mixin
   createBindings: (element=@element) ->
     @bindings ?= []
 
-    for child in element.children
+    for child in Array::slice.call(element.children)
       @createBindings(child)
 
-    for attribute in element.attributes
+    for attribute in Array::slice.call(element.attributes)
       if match = attribute.name.match(/^x-bind-(.*)/)
         type = match[1]
         binding = @factory.createBinding(type, this, element, @model, attribute.value)

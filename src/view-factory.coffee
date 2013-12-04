@@ -83,9 +83,8 @@ class ViewFactory extends Mixin
     if view = @getCachedView(model)
       view
     else if @canBuildViewForModel(model)
-      if element = @buildElement(model)
-        factory = this
-        @cacheView(@buildViewInstance({model, element, factory, @viewProperties}))
+      if view = @buildViewInstance(model)
+        @cacheView(view)
       else
         throw new Error("Template did not specify content")
     else
@@ -94,8 +93,9 @@ class ViewFactory extends Mixin
       else
         @parent?.buildView(model)
 
-  buildViewInstance: ({model, element, factory, viewProperties}) ->
-    new View(model, element, this, @viewProperties)
+  buildViewInstance: (model) ->
+    if element = @buildElement(model)
+      new View(model, element, this, @viewProperties)
 
   canBuildViewForModel: (model) ->
     if @modelClassName?
