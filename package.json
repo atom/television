@@ -1,6 +1,6 @@
 {
   "name": "television",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "A minimalist framework for binding reactive views to observable models",
   "main": "lib/television",
   "scripts": {
