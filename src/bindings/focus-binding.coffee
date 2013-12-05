@@ -20,6 +20,11 @@ class FocusBinding extends Binding
     @element.addEventListener('focus', @onElementFocused)
     @element.addEventListener('blur', @onElementBlurred)
 
+  destroy: ->
+    super
+    @element.removeEventListener('focus', @onElementFocused)
+    @element.removeEventListener('blur', @onElementBlurred)
+
   focusElement: ->
     unless @handlingFocus
       @handlingFocus = true
