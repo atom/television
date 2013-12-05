@@ -120,7 +120,7 @@ class ViewFactory extends Mixin
     if binder = @getBinder(id)
       reader = @createReader(model, expression)
       writer = @createWriter(model, expression)
-      binder.bind({factory: this, id, view, element, reader, writer})
+      binder.bind({factory: this, id, view, element, reader, writer, model, expression})
 
   destroyBinding: (id, binding) ->
     if binder = @getBinder(id)
