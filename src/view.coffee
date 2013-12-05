@@ -18,7 +18,6 @@ class View extends Mixin
       if @constructor.canBuildViewForModel(@model)
         @element = @constructor.buildElement(@model)
         @factory = @constructor
-        @constructor.cacheView(this)
       else
         throw new Error("This view is not compatible with the given model")
 
