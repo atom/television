@@ -26,25 +26,27 @@ class FocusBinding extends Binding
     @element.removeEventListener('blur', @onElementBlurred)
 
   focusElement: ->
-    unless @handlingFocus
-      @handlingFocus = true
-      @element.focus()
-      @handlingFocus = false
+    return if @handlingFocus
+    return if document.activeElement is @element
+    @handlingFocus = true
+    @element.focus()
+    @handlingFocus = false
 
   blurElement: ->
-    unless @handlingBlur
-      @handlingBlur = true
-      @element.blur()
-      @handlingBlur = false
+    return if @handlingBlur
+    return unless document.activeElement is @element
+    @handlingBlur = true
+    @element.blur()
+    @handlingBlur = false
 
   onElementFocused: =>
-    unless @handlingFocus
-      @handlingFocus = true
-      @writer.emit 'value', true
-      @handlingFocus = false
+    return if  @handlingFocus
+    @handlingFocus = true
+    @writer.emit 'value', true
+    @handlingFocus = false
 
   onElementBlurred: =>
-    unless @handlingBlur
-      @handlingBlur = true
-      @writer.emit 'value', false
-      @handlingBlur = false
+    return if @handlingBlur
+    @handlingBlur = true
+    @writer.emit 'value', false
+    @handlingBlur = false
