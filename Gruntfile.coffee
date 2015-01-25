@@ -2,14 +2,6 @@ module.exports = (grunt) ->
   grunt.initConfig
     pkg: grunt.file.readJSON('package.json')
 
-    peg:
-      expression:
-        src: "src/expression-parser.pegjs",
-        dest: "lib/expression-parser.js"
-      template:
-        src: "src/template-parser.pegjs",
-        dest: "lib/template-parser.js"
-
     coffee:
       glob_to_multiple:
         expand: true
@@ -24,13 +16,16 @@ module.exports = (grunt) ->
           level: 'error'
         max_line_length:
           level: 'ignore'
+        indentation:
+          level: 'ignore'
 
       src: ['src/*.coffee']
       test: ['spec/*.coffee']
+      gruntfile: ['Gruntfile.coffee']
 
     shell:
       test:
-        command: 'node --harmony_collections node_modules/.bin/jasmine-focused --coffee --captureExceptions spec'
+        command: 'node --harmony_collections node_modules/.bin/jasmine-focused --coffee --captureExceptions --forceexit spec'
         options:
           stdout: true
           stderr: true
@@ -39,9 +34,8 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks('grunt-contrib-coffee')
   grunt.loadNpmTasks('grunt-shell')
   grunt.loadNpmTasks('grunt-coffeelint')
-  grunt.loadNpmTasks('grunt-peg');
 
   grunt.registerTask 'clean', -> require('rimraf').sync('lib')
-  grunt.registerTask('lint', ['coffeelint:src', 'coffeelint:test'])
-  grunt.registerTask('default', ['coffeelint', 'coffee', 'peg'])
-  grunt.registerTask('test', ['lint', 'shell:test'])
+  grunt.registerTask('lint', ['coffeelint'])
+  grunt.registerTask('default', ['coffee', 'lint'])
+  grunt.registerTask('test', ['coffee', 'lint', 'shell:test'])
