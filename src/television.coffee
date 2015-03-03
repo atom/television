@@ -10,4 +10,4 @@ registerElement = (name, prototype) ->
   elementPrototype[key] = value for key, value of prototype
   document.registerElement(name, prototype: elementPrototype)
 
-module.exports = {setDOMScheduler, buildTagFunctions, registerElement}
+module.exports = {setDOMScheduler, buildTagFunctions, registerElement, buildVNode}
