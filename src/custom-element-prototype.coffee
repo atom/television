@@ -1,7 +1,7 @@
 diff = require "virtual-dom/diff"
 patch = require "virtual-dom/patch"
 
-buildVNode = require './build-vnode'
+buildVirtualNode = require './build-virtual-node'
 
 module.exports = Object.create HTMLElement.prototype,
   domScheduler: value: {
@@ -25,7 +25,7 @@ module.exports = Object.create HTMLElement.prototype,
     @domScheduler.readDocument(@readSync.bind(this))
 
   updateSync: value: ->
-    @oldVirtualDOM ?= buildVNode(@tagName.toLowerCase())
+    @oldVirtualDOM ?= buildVirtualNode(@tagName.toLowerCase())
     newVirtualDOM = @render()
     patch(this, diff(@oldVirtualDOM, newVirtualDOM))
     @oldVirtualDOM = newVirtualDOM

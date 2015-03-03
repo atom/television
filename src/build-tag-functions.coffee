@@ -1,4 +1,4 @@
-buildVNode = require './build-vnode'
+buildVirtualNode = require './build-virtual-node'
 
 DEFAULT_TAG_NAMES =
   'a abbr address article aside audio b bdi bdo blockquote body button canvas
@@ -13,7 +13,7 @@ DEFAULT_TAG_NAMES =
 DEFAULT_TAG_FUNCTIONS = {}
 for tagName in DEFAULT_TAG_NAMES
   do (tagName) ->
-    DEFAULT_TAG_FUNCTIONS[tagName] = -> buildVNode(tagName, arguments...)
+    DEFAULT_TAG_FUNCTIONS[tagName] = -> buildVirtualNode(tagName, arguments...)
 
 module.exports = ->
   tags = {}
@@ -21,7 +21,7 @@ module.exports = ->
   for tagFunctionName in arguments
     tagName = tagFunctionName.replace(/([A-Z])/g, "-$1").replace(/^-/, "").toLowerCase()
     do (tagFunctionName, tagName) ->
-      tags[tagFunctionName] = -> buildVNode(tagName, arguments...)
+      tags[tagFunctionName] = -> buildVirtualNode(tagName, arguments...)
 
   for tagName, tagFunction of DEFAULT_TAG_FUNCTIONS
     tags[tagName] = tagFunction

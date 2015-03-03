@@ -1,4 +1,4 @@
-buildVNode = require './build-vnode'
+buildVirtualNode = require './build-virtual-node'
 buildTagFunctions = require './build-tag-functions'
 CustomElementPrototype = require './custom-element-prototype'
 
@@ -10,4 +10,4 @@ registerElement = (name, prototype) ->
   elementPrototype[key] = value for key, value of prototype
   document.registerElement(name, prototype: elementPrototype)
 
-module.exports = {setDOMScheduler, buildTagFunctions, registerElement, buildVNode}
+module.exports = {setDOMScheduler, buildTagFunctions, registerElement, buildVirtualNode}
