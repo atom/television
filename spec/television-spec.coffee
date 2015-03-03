@@ -38,6 +38,40 @@ describe "television", ->
         <television-test><div>Hello Moon!</div><div class="subtitle">How Are You?</div></television-test>
       """
 
+    it "calls lifecyle hooks on the custom element", ->
+      {div, TelevisionTest} = tv.buildTagFunctions('TelevisionTest')
+      tv.registerElement 'television-test',
+        didCreateHookCalled: false
+        didAttachHookCalled: false
+        didDetachHookCalled: false
+
+        render: ->
+          TelevisionTest(div "Hello World!")
+
+        didCreate: ->
+          @didCreateHookCalled = true
+
+        didAttach: ->
+          @didAttachHookCalled = true
+
+        didDetach: ->
+          @didDetachHookCalled = true
+
+      element = document.createElement('television-test')
+      expect(element.didCreateHookCalled).toBe true
+      expect(element.didAttachHookCalled).toBe false
+      expect(element.didDetachHookCalled).toBe false
+
+      attachToDocument(element)
+      expect(element.didCreateHookCalled).toBe true
+      expect(element.didAttachHookCalled).toBe true
+      expect(element.didDetachHookCalled).toBe false
+
+      element.remove()
+      expect(element.didCreateHookCalled).toBe true
+      expect(element.didAttachHookCalled).toBe true
+      expect(element.didDetachHookCalled).toBe true
+
   describe ".buildTagFunctions(tagNames...)", ->
     it "returns an object with functions for all the HTML tags, plus any named custom tags", ->
       {ChatPanel, div, span} = tv.buildTagFunctions('ChatPanel')
