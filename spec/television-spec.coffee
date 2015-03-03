@@ -5,14 +5,18 @@ attachToDocument = (element) ->
   document.getElementById('jasmine-content').appendChild(element)
 
 describe "television", ->
+  elementConstructor = null
+
   afterEach ->
+    elementConstructor?.unregisterElement()
+    elementConstructor = null
     document.getElementById('jasmine-content').innerHTML = ""
 
   describe ".registerElement(name, properties)", ->
     it "registers a custom element that updates based on the virtual DOM", ->
       {div, TelevisionTest} = tv.buildTagFunctions('TelevisionTest')
 
-      tv.registerElement 'television-test',
+      elementConstructor = tv.registerElement 'television-test',
         subject: "World"
 
         render: ->
@@ -42,7 +46,7 @@ describe "television", ->
     it "calls lifecyle hooks on the custom element", ->
       {div, TelevisionTest} = tv.buildTagFunctions('TelevisionTest')
 
-      tv.registerElement 'television-test',
+      elementConstructor = tv.registerElement 'television-test',
         didCreateHookCalled: false
         didAttachHookCalled: false
         didDetachHookCalled: false
@@ -77,7 +81,7 @@ describe "television", ->
     it "interacts with the assigned DOM update scheduler on calls to ::update to update and read the DOM", ->
       {div, TelevisionTest} = tv.buildTagFunctions('TelevisionTest')
 
-      tv.registerElement 'television-test',
+      elementConstructor = tv.registerElement 'television-test',
         updateSyncCalled: false
         readSyncCalled: false
 
@@ -111,6 +115,14 @@ describe "television", ->
       readFns[0]()
       expect(element.updateSyncCalled).toBe true
       expect(element.readSyncCalled).toBe true
+
+    it "throws an exception if the same element name is registered without the previous being unregistered", ->
+      {TelevisionTest} = tv.buildTagFunctions('TelevisionTest')
+      elementConstructor = tv.registerElement 'television-test', render: -> TelevisionTest("Hello")
+      expect(-> tv.registerElement 'television-test', render: -> TelevisionTest("Goodbye")).toThrow()
+      elementConstructor.unregisterElement()
+      expect(-> elementConstructor.unregisterElement()).toThrow()
+      elementConstructor = tv.registerElement 'television-test', render: -> TelevisionTest("Hello Again")
 
   describe ".buildTagFunctions(tagNames...)", ->
     it "returns an object with functions for all the HTML tags, plus any named custom tags", ->

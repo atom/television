@@ -12,9 +12,16 @@ registerElement = (name, prototype) ->
   elementPrototype[key] = value for key, value of prototype
 
   if elementConstructor = elementConstructors[name]
+    unless Object.getPrototypeOf(elementConstructor.prototype) is HTMLElement.prototype
+      throw new Error("Already registered element '#{name}'. Call .unregisterElement() on its constructor first.")
     Object.setPrototypeOf(elementConstructor.prototype, elementPrototype)
     elementConstructor
   else
-    elementConstructors[name] = document.registerElement(name, prototype: Object.create(elementPrototype))
+    elementConstructor = document.registerElement(name, prototype: Object.create(elementPrototype))
+    elementConstructor.unregisterElement = ->
+      if Object.getPrototypeOf(elementConstructor.prototype) is HTMLElement.prototype
+        throw new Error("Already unregistered element '#{name}'.")
+      Object.setPrototypeOf(elementConstructor.prototype, HTMLElement.prototype)
+    elementConstructors[name] = elementConstructor
 
 module.exports = {setDOMScheduler, buildTagFunctions, registerElement, buildVirtualNode}
