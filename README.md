@@ -1,10 +1,10 @@
 # Television
 
-Television aims to cleanly integrate the virtual DOM approach of React.js into HTML 5 custom elements.
+Television is an experimental, minimal implementation of the virtual DOM approach to view construction that aims to integrate with the web platform rather than abstract it away. This library is a thin wrapper around the [virtual-dom][virtual-dom] library, and it focuses on allowing you to define HTML 5 custom elements with declarative markup. Efficient DOM access can be ensured in a manner that cooperates with other libraries by assigning an external DOM update scheduler. Other concerns, such as defining and observing a data model and listening for DOM events, are left to other libraries.
 
 ```coffee
 tv = require 'television'
-[TaskList, li, input] = tv.tags 'task-list', 'li', 'input'
+{TaskList, li, input} = tv.buildTagFunctions('task-list')
 
 tv.registerElement 'task-list',
   render: ->
@@ -31,19 +31,25 @@ To update an element:
 
 ```coffee
 taskListElement.tasks.push {title: "Do Homework", done: false}
-taskListElement.updateSync()
+taskListElement.update()
 ```
 
-## Ideas
+## Assigning a DOM Scheduler
 
-I don't think this library should include any state management system. When you want an element to update, you should just request it explicitly. This makes it easier to keep state in whatever location makes sense.
+You should assign a DOM update scheduler on Television that's responsible for coordinating DOM updates among all components. The scheduler should have an `updateDocument` and a `readDocument` method. If you're using this library within Atom, you can assign `atom.views` as the scheduler:
 
-## Possible next steps:
+```coffee
+tv = require 'television'
+tv.setDOMScheduler(atom.view)
+```
 
-* Add an asynchronous `::update` method that participates in a managed lifecycle
-  to avoid reflows.
-* Add `::didAttach` and `::didDetach` hooks.
-* Add `::willUpdate` and `::didUpdate` hooks.
-* Add `::readBeforeUpdate` and `::readAfterUpdate` hooks where DOM reads can
-  be performed at moments that won't cause a reflow.
-* Cascade attribute updates through custom child elements.
+## Hooks
+
+Elements registered via `registerElement` can define a few lifecycle hooks:
+
+* `::didCreate` Called after the element is created but before it has content.
+* `::didAttach` Called after the element is attached and rendered.
+* `::didDetach` Called after the element is detached but before its content is cleared.
+* `::readSync` Called after the element is updated. If you need to read the DOM, you can safely do so here without blocking a DOM write. Do not write to the DOM in this method!
+
+[virtual-dom]: https://github.com/Matt-Esch/virtual-dom
