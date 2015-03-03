@@ -1,6 +1,17 @@
 VNode = require 'virtual-dom/vnode/vnode'
 VText = require 'virtual-dom/vnode/vtext'
 
+refsStack = require './refs-stack'
+
+class RefHook
+  constructor: (@refName) ->
+  hook: (node) ->
+    if refs = refsStack[refsStack.length - 1]
+      refs[@refName] = node
+  unhook: (node) ->
+    if refs = refsStack[refsStack.length - 1]
+      delete refs[@refName]
+
 module.exports = ->
   [tagName] = arguments
   if arguments[1]?.constructor is Object
@@ -13,6 +24,9 @@ module.exports = ->
     if attributes.className?
       properties.className = attributes.className
       delete attributes.className
+
+    if attributes.ref?
+      properties.ref = new RefHook(attributes.ref)
 
     childrenIndex = 2
   else

@@ -78,6 +78,29 @@ describe "television", ->
       expect(element.didAttachHookCalled).toBe true
       expect(element.didDetachHookCalled).toBe true
 
+    it "assigns references to DOM nodes based on 'ref' attributes", ->
+      {div, TelevisionTest} = tv.buildTagFunctions('TelevisionTest')
+
+      elementConstructor = tv.registerElement 'television-test',
+        foo: true
+
+        render: ->
+          TelevisionTest(
+            div ref: "div1", className: "div-1"
+            div ref: "div2", className: "div-2" if @foo
+          )
+
+      element = document.createElement('television-test')
+      attachToDocument(element)
+
+      expect(element.refs.div1.classList.contains("div-1")).toBe true
+      expect(element.refs.div2.classList.contains("div-2")).toBe true
+
+      element.foo = false
+      element.updateSync()
+      expect(element.refs.div1.classList.contains("div-1")).toBe true
+      expect(element.refs.div2).toBeUndefined()
+
     it "interacts with the assigned DOM update scheduler on calls to ::update to update and read the DOM", ->
       {div, TelevisionTest} = tv.buildTagFunctions('TelevisionTest')
 

@@ -2,6 +2,7 @@ diff = require "virtual-dom/diff"
 patch = require "virtual-dom/patch"
 
 buildVirtualNode = require './build-virtual-node'
+refsStack = require './refs-stack'
 
 module.exports = Object.create HTMLElement.prototype,
   domScheduler:
@@ -11,6 +12,7 @@ module.exports = Object.create HTMLElement.prototype,
       updateDocument: (fn) -> fn()
 
   createdCallback: value: ->
+    @refs = {}
     @didCreate?()
 
   attachedCallback: value: ->
@@ -20,6 +22,7 @@ module.exports = Object.create HTMLElement.prototype,
   detachedCallback: value: ->
     @didDetach?()
     @innerHTML = ""
+    @refs = {}
 
   update: value: ->
     @domScheduler.updateDocument(@updateSync.bind(this))
@@ -30,7 +33,9 @@ module.exports = Object.create HTMLElement.prototype,
     value: ->
       @oldVirtualDOM ?= buildVirtualNode(@tagName.toLowerCase())
       newVirtualDOM = @render()
+      refsStack.push(@refs)
       patch(this, diff(@oldVirtualDOM, newVirtualDOM))
+      refsStack.pop()
       @oldVirtualDOM = newVirtualDOM
 
   readSync:
