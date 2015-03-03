@@ -2,7 +2,7 @@ buildVirtualNode = require './build-virtual-node'
 buildTagFunctions = require './build-tag-functions'
 CustomElementPrototype = require './custom-element-prototype'
 
-retargetablePrototypes = {}
+elementConstructors = {}
 
 setDOMScheduler = (domScheduler) ->
   CustomElementPrototype.domScheduler = domScheduler
@@ -11,10 +11,10 @@ registerElement = (name, prototype) ->
   elementPrototype = Object.create(CustomElementPrototype)
   elementPrototype[key] = value for key, value of prototype
 
-  if retargetablePrototypes[name]
-    Object.setPrototypeOf(retargetablePrototypes[name], elementPrototype)
+  if elementConstructor = elementConstructors[name]
+    Object.setPrototypeOf(elementConstructor.prototype, elementPrototype)
+    elementConstructor
   else
-    retargetablePrototypes[name] = Object.create(elementPrototype)
-    document.registerElement(name, prototype: retargetablePrototypes[name])
+    elementConstructors[name] = document.registerElement(name, prototype: Object.create(elementPrototype))
 
 module.exports = {setDOMScheduler, buildTagFunctions, registerElement, buildVirtualNode}
