@@ -25,7 +25,6 @@ describe "television", ->
       expect(element.outerHTML).toBe """
         <television-test><div>Hello World!</div></television-test>
       """
-      return
 
       element.subject = "Moon"
       element.updateSync()
