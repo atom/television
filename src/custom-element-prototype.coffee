@@ -4,10 +4,11 @@ patch = require "virtual-dom/patch"
 buildVirtualNode = require './build-virtual-node'
 
 module.exports = Object.create HTMLElement.prototype,
-  domScheduler: value: {
-    readDocument: (fn) -> fn()
-    updateDocument: (fn) -> fn()
-  }
+  domScheduler:
+    writable: true
+    value:
+      readDocument: (fn) -> fn()
+      updateDocument: (fn) -> fn()
 
   createdCallback: value: ->
     @didCreate?()
@@ -24,10 +25,14 @@ module.exports = Object.create HTMLElement.prototype,
     @domScheduler.updateDocument(@updateSync.bind(this))
     @domScheduler.readDocument(@readSync.bind(this))
 
-  updateSync: value: ->
-    @oldVirtualDOM ?= buildVirtualNode(@tagName.toLowerCase())
-    newVirtualDOM = @render()
-    patch(this, diff(@oldVirtualDOM, newVirtualDOM))
-    @oldVirtualDOM = newVirtualDOM
+  updateSync:
+    writable: true
+    value: ->
+      @oldVirtualDOM ?= buildVirtualNode(@tagName.toLowerCase())
+      newVirtualDOM = @render()
+      patch(this, diff(@oldVirtualDOM, newVirtualDOM))
+      @oldVirtualDOM = newVirtualDOM
 
-  readSync: value: ->
+  readSync:
+    writable: true
+    value: ->
