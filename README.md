@@ -69,3 +69,17 @@ You should assign a DOM update scheduler on Television that's responsible for co
 tv = require 'television'
 tv.setDOMScheduler(atom.view)
 ```
+
+## Unregistering Elements
+
+To unregister a custom element, call `.unregisterElement` on the element constructor. After doing so, you'll be able to register another element with the same name.
+
+```coffee
+UserCard = tv.registerElement 'my-element',
+  render: -> MyElement("Hello World")
+
+# Later...
+UserCard.unregisterElement()
+```
+
+Under the hood, we dynamically reassign prototypes to make this possible, since the current DOM APIs don't support unregistering elements.
