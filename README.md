@@ -34,16 +34,23 @@ taskListElement.tasks.push {title: "Do Homework", done: false}
 taskListElement.update()
 ```
 
-## Assigning a DOM Scheduler
+## References
 
-You should assign a DOM update scheduler on Television that's responsible for coordinating DOM updates among all components. The scheduler should have an `updateDocument` and a `readDocument` method. If you're using this library within Atom, you can assign `atom.views` as the scheduler:
+Custom elements have a `refs` hash that can be populated with references to DOM nodes. Use a `ref` attribute on any element in your `render` method to automatically maintain a reference to its node.
 
 ```coffee
-tv = require 'television'
-tv.setDOMScheduler(atom.view)
+tv.registerElement 'user-card',
+  render: ->
+    UserCard(
+      img href: user.avatarURL, ref: 'avatarImage'
+      span user.fullName
+    )
+
+userCard = document.createElement('user-card')
+userCard.refs.avatarImage # --> reference to avatar image DOM element
 ```
 
-## Hooks
+## Lifecycle Hooks
 
 Elements registered via `registerElement` can define a few lifecycle hooks:
 
@@ -53,3 +60,12 @@ Elements registered via `registerElement` can define a few lifecycle hooks:
 * `::readSync` Called after the element is updated. If you need to read the DOM, you can safely do so here without blocking a DOM write. Do not write to the DOM in this method!
 
 [virtual-dom]: https://github.com/Matt-Esch/virtual-dom
+
+## Assigning a DOM Scheduler
+
+You should assign a DOM update scheduler on Television that's responsible for coordinating DOM updates among all components. The scheduler should have an `updateDocument` and a `readDocument` method. If you're using this library within Atom, you can assign `atom.views` as the scheduler:
+
+```coffee
+tv = require 'television'
+tv.setDOMScheduler(atom.view)
+```
