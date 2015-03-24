@@ -16,7 +16,8 @@ module.exports = ->
   [tagName] = arguments
   if arguments[1]?.constructor is Object
     attributes = arguments[1]
-    properties = {}
+    properties = {attributes}
+
     if attributes.style?
       properties.style = attributes.style
       delete attributes.style

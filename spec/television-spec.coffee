@@ -149,11 +149,15 @@ describe "television", ->
 
   describe ".buildTagFunctions(tagNames...)", ->
     it "returns an object with functions for all the HTML tags, plus any named custom tags", ->
-      {ChatPanel, div, span} = tv.buildTagFunctions('ChatPanel')
+      {ChatPanel, div, span, img} = tv.buildTagFunctions('ChatPanel')
 
       expect(createElement(ChatPanel()).outerHTML).toBe """
         <chat-panel></chat-panel>
       """
       expect(createElement(div(className: "hello", span("hello"))).outerHTML).toBe """
         <div class="hello"><span>hello</span></div>
+      """
+
+      expect(createElement(img(src: "/foo/bar.png")).outerHTML).toBe """
+        <img src="/foo/bar.png">
       """
