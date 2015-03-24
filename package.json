@@ -2,7 +2,7 @@
   "name": "television",
   "version": "0.5.0",
   "description": "Experimental view library.",
-  "main": "./src/television",
+  "main": "./lib/television",
   "scripts": {
     "prepublish": "grunt clean lint coffee",
     "test": "grunt test"
