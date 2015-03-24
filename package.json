@@ -1,6 +1,6 @@
 {
   "name": "television",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Experimental view library.",
   "main": "./lib/television",
   "scripts": {
