@@ -1,6 +1,8 @@
 VNode = require 'virtual-dom/vnode/vnode'
 VText = require 'virtual-dom/vnode/vtext'
 
+Observation = require './observation'
+ObservationWidget = require './observation-widget'
 refsStack = require './refs-stack'
 
 class RefHook
@@ -30,6 +32,8 @@ module.exports = ->
       children.push(new VText(child.toString()))
     else if child instanceof VNode
       children.push(child)
+    else if child instanceof Observation
+      children.push(new ObservationWidget(child))
 
   node = new VNode(tagName, properties, children)
   node
