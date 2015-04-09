@@ -15,20 +15,8 @@ class RefHook
 module.exports = ->
   [tagName] = arguments
   if arguments[1]?.constructor is Object
-    attributes = arguments[1]
-    properties = {attributes}
-
-    if attributes.style?
-      properties.style = attributes.style
-      delete attributes.style
-
-    if attributes.className?
-      properties.className = attributes.className
-      delete attributes.className
-
-    if attributes.ref?
-      properties.ref = new RefHook(attributes.ref)
-
+    properties = arguments[1]
+    properties.ref = new RefHook(properties.ref) if properties.ref?
     childrenIndex = 2
   else
     childrenIndex = 1
