@@ -2,11 +2,12 @@
 
 module.exports =
 class Observation
-  constructor: (fn) ->
+  constructor: (@value, initFn) ->
     @emitter = new Emitter
-    fn (value) =>
-      @value = value
-      @emitter.emit('change')
+    initFn(@reportChange)
+
+  reportChange: (@value) =>
+    @emitter.emit('change')
 
   getValue: -> @value
 
@@ -14,6 +15,5 @@ class Observation
 
   map: (transform) ->
     source = this
-    new Observation (setValue) ->
-      setValue(transform(source.getValue()))
-      source.onChange -> setValue(transform(source.getValue()))
+    new Observation transform(source.getValue()), (reportChange) ->
+      source.onChange -> reportChange(transform(source.getValue()))

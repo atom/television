@@ -11,9 +11,8 @@ class ObservationWidget
 
   init: ->
     @vnode = @getObservedVnode()
-    node = createElement(@vnode)
-    @subscribe(node)
-    node
+    @subscribe()
+    @node = createElement(@vnode)
 
   update: (previousWidget, node) ->
     if this isnt previousWidget
@@ -21,10 +20,8 @@ class ObservationWidget
       @subscribe(node)
 
     oldVnode = previousWidget.vnode
-    newVnode = @getObservedVnode()
-    patch(node, diff(oldVnode, newVnode))
-    @vnode = newVnode
-    return
+    @vnode = @getObservedVnode()
+    @node = patch(node, diff(oldVnode, @vnode))
 
   destroy: ->
     @unsubscribe()
@@ -36,9 +33,10 @@ class ObservationWidget
     else
       value
 
-  subscribe: (node) ->
+  subscribe: ->
     @observationDisposable =
-      @observation.onChange => @update(this, node)
+      @observation.onChange =>
+        @update(this, @node)
 
   unsubscribe: ->
     @observationDisposable.dispose()

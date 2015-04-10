@@ -1,32 +1,74 @@
 observe = require '../src/observe'
 
-describe "observe", ->
-  it "can observe single properties on objects", ->
-    object = {a: 1}
-    observation = observe(object, 'a')
-    mappedObservation = observation.map (v) -> v + 100
+describe "observe(...)", ->
+  describe "when called with an object and a property name", ->
+    it "returns an observation based on the property's value", ->
+      object = {a: 1}
+      observation = observe(object, 'a')
+      changeCount = 0
+      observation.onChange -> changeCount++
 
-    observation.changeCount = 0
-    mappedObservation.changeCount = 0
-    observation.onChange -> observation.changeCount++
-    mappedObservation.onChange -> mappedObservation.changeCount++
+      expect(observation.getValue()).toBe 1
 
-    expect(observation.getValue()).toBe 1
-    expect(mappedObservation.getValue()).toBe 101
+      object.a = 2
 
-    object.a = 2
-    waitsFor ->
-      observation.changeCount is 1 and mappedObservation.changeCount is 1
+      waitsFor ->
+        changeCount is 1
 
-    runs ->
-      expect(observation.getValue()).toBe 2
-      expect(mappedObservation.getValue()).toBe 102
+      runs ->
+        expect(observation.getValue()).toBe 2
+        object.a = 3
 
-      object.a = 3
+      waitsFor ->
+        changeCount is 2
 
-    waitsFor ->
-      observation.changeCount is 2 and mappedObservation.changeCount is 2
+      runs ->
+        expect(observation.getValue()).toBe 3
 
-    runs ->
-      expect(observation.getValue()).toBe 3
-      expect(mappedObservation.getValue()).toBe 103
+    describe "when the last argument is a transform function", ->
+      it "maps the transform function over the property observation's value", ->
+        object = {a: 1}
+        observation = observe(object, 'a', (v) -> v + 100)
+        changeCount = 0
+        observation.onChange -> changeCount++
+
+        expect(observation.getValue()).toBe 101
+
+        object.a = 2
+
+        waitsFor ->
+          changeCount is 1
+
+        runs ->
+          expect(observation.getValue()).toBe 102
+          object.a = 3
+
+        waitsFor ->
+          changeCount is 2
+
+        runs ->
+          expect(observation.getValue()).toBe 103
+
+  describe "when called with an object, multiple property names, and a function", ->
+    it "returns a composite observation based on applying the function to all the property values", ->
+      object = {a: 1, b: 2, c: 3}
+      observation = observe(object, ['a', 'b', 'c'], ((a, b, c) -> a + b + c))
+      changeCount = 0
+      observation.onChange -> changeCount++
+
+      expect(observation.getValue()).toBe 6
+
+      object.a = 2
+
+      waitsFor ->
+        changeCount is 1
+
+      runs ->
+        expect(observation.getValue()).toBe 7
+        object.b = 3
+
+      waitsFor ->
+        changeCount is 2
+
+      runs ->
+        expect(observation.getValue()).toBe 8
