@@ -1,3 +1,4 @@
+{Disposable} = require 'event-kit'
 Observation = require './observation'
 
 module.exports = (object, properties, transform) ->
@@ -10,11 +11,14 @@ observeProperty = (object, property, transform) ->
   initialValue = transform?(object[property]) ? object[property]
 
   new Observation initialValue, (reportChange) ->
-    Object.observe object, (changes) ->
+    observeHandler = (changes) ->
       for change in changes when change.name is property
         newValue = transform?(object[property]) ? object[property]
         reportChange(newValue)
         break
+
+    Object.observe(object, observeHandler)
+    new Disposable -> Object.unobserve(object, observeHandler)
 
 observeProperties = (object, properties, transform) ->
   unless transform?

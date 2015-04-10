@@ -72,3 +72,27 @@ describe "observe(...)", ->
 
       runs ->
         expect(observation.getValue()).toBe 8
+
+  it "only observes the objects when there are change subscriptions", ->
+    spyOn(Object, 'observe').andCallThrough()
+    spyOn(Object, 'unobserve').andCallThrough()
+    object = {a: 1}
+    observation = observe(object, 'a')
+
+    expect(Object.observe.callCount).toBe 0
+
+    disposable1 = observation.onChange ->
+    disposable2 = observation.onChange ->
+    expect(Object.observe.callCount).toBe 1
+    expect(Object.observe.argsForCall[0][0]).toBe object
+
+    disposable1.dispose()
+    expect(Object.unobserve.callCount).toBe 0
+    disposable2.dispose()
+    expect(Object.unobserve.callCount).toBe 1
+    expect(Object.unobserve.argsForCall[0][0]).toBe object
+    expect(Object.unobserve.argsForCall[0][1]).toBe Object.observe.argsForCall[0][1]
+
+    observation.onChange ->
+    expect(Object.observe.callCount).toBe 2
+    expect(Object.observe.argsForCall[1][0]).toBe object
