@@ -1,4 +1,5 @@
-# Television
+##### Atom and all repositories under Atom will be archived on December 15, 2022. Learn more in our [official announcement](https://github.blog/2022-06-08-sunsetting-atom/)
+ # Television
 
 Television is an experimental, minimal implementation of the virtual DOM approach to view construction that aims to integrate with the web platform rather than abstract it away. This library is a thin wrapper around the [virtual-dom][virtual-dom] library, and it focuses on allowing you to define HTML 5 custom elements with declarative markup. Efficient DOM access can be ensured in a manner that cooperates with other libraries by assigning an external DOM update scheduler. Other concerns, such as defining and observing a data model and listening for DOM events, are left to other libraries. The examples in this README use an embedded DSL syntax, but it should be possible to target this library with a JSX preprocessor for integrated support for HTML literals.
 
